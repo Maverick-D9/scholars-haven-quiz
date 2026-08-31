@@ -1,0 +1,10 @@
+
+# Python
+__pycache__/
+*.pyc
+
+# Database - we don't want to upload student data to GitHub
+quiz.db
+
+# Virtual environment
+venv/
