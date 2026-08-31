@@ -1,4 +1,4 @@
-rom flask import Flask, render_template_string, request, redirect, session
+from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
 from datetime import datetime
