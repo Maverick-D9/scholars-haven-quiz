@@ -294,6 +294,11 @@ def reset(attempt_id):
     user = User.query.get(attempt.user_id)
     db.session.delete(attempt); db.session.delete(user); db.session.commit(); return redirect("/admin_panel")
 
+@app.route("/debug")
+def debug():
+    with open(__file__, "r") as f:
+        code = f.read()
+    return f"<pre>{code[:2000]}</pre>" # shows first 2000 chars of app.py
 @app.route("/logout")
 def logout(): session.pop('is_admin', None); return redirect("/")
 
