@@ -299,6 +299,32 @@ def debug():
     with open(__file__, "r") as f:
         code = f.read()
     return f"<pre>{code[:2000]}</pre>" # shows first 2000 chars of app.py
+# TEMPLATES
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.1</h1>
+<p style="color:red; font-weight:700;">NEW CODE ACTIVE</p>
+<p>All records are saved permanently. 1 Attempt Every 6 Hours</p>
+<a href="/reset_all" onclick="return confirm('DANGER: Reset ALL users? This cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">⚠️ RESET ALL USERS</a>
+<a href="/logout" style="float:right">Logout</a>
+<table><tr><th>Name</th><th>Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>
+{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td>
+<td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset 6hr</a></td></tr>{% endfor %}</table></div>"""
+
+# RESET ROUTES
+@app.route("/reset/<int:attempt_id>")
+def reset_attempt(attempt_id):
+    if not session.get("admin"): return redirect("/admin_login")
+    a = Attempt.query.get(attempt_id)
+    if a:
+        db.session.delete(a)
+        db.session.commit()
+    return redirect("/admin")
+
+@app.route("/reset_all")
+def reset_all():
+    if not session.get("admin"): return redirect("/admin_login")
+    db.session.query(Attempt).delete()
+    db.session.commit()
+    return redirect("/admin")
 @app.route("/logout")
 def logout(): session.pop('is_admin', None); return redirect("/")
 
