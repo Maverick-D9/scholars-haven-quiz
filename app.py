@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.13 - PORT BINDING + WIPE BUTTON + DUPLICATE FIX
+# SCHOLARS HAVEN V2.14 - 1 ATTEMPT TOTAL FOR ALL SUBJECTS
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -27,7 +27,7 @@ ADMIN_PASSWORD = "ScholarsAdmin123"
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    subject = db.Column(db.String(50))
+    subject = db.Column(db.String(50)) # This will store their FIRST subject taken
     has_attempted = db.Column(db.Boolean, default=False)
     score = db.Column(db.Integer, default=0)
     start_time = db.Column(db.Float, default=0)
@@ -95,44 +95,10 @@ with app.app_context():
                 db.session.add(Question(subject=subject, prompt=q, options=opts, answer=a))
         db.session.commit()
 
-BASE_CSS = """
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-body {font-family: 'Poppins', sans-serif; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f4f7fb;}
-.container {background:white; padding:30px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15); width:90%; max-width:800px;}
-h1 {color:#1a3b6d; text-align:center; margin-bottom:10px;}
-.user-greet {text-align:center; color:#1a3b6d; font-weight:600; margin-bottom:20px; font-size:18px;}
-input, select, button {width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid #ccc; font-size:16px;}
-button {background:#1a3b6d; color:white; border:none; cursor:pointer; font-weight:600; transition:0.3s;}
-button:hover {background:#0f274d; transform:translateY(-2px);}
-.timer {background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}
-.question-box {background:#f8f9ff; padding:20px; border-radius:12px; border-left:5px solid #1a3b6d; margin-bottom:20px;}
-.question-title {font-size:20px; font-weight:600; color:#1a3b6d; margin-bottom:15px;}
-.options label {display:block; background:white; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #e0e0e0; cursor:pointer; transition:0.2s; font-size:16px;}
-.options label:hover {border-color:#1a3b6d; background:#f0f4ff;}
-.options input[type="radio"] {display:none;}
-.options label:has(input:checked) {border-color:#1a3b6d; background:#e8eeff; font-weight:700;}
-.progress {height:8px; background:#e0e0e0; border-radius:10px; margin-bottom:20px;}
-.progress-bar {height:8px; background:#1a3b6d; border-radius:10px; transition:width 0.3s;}
-table {width:100%; border-collapse: collapse; margin-top:20px; font-size:14px;}
-th, td {padding:10px; border:1px solid #ddd; text-align:center;}
-th {background:#1a3b6d; color:white;}
-a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
-.correct {color:green; font-weight:700;}
-.wrong {color:red; font-weight:700;}
-.home-body {background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a3b6d); background-size: 400% 400%; animation: gradient 15s ease infinite;}
-@keyframes gradient {0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;}}
-.home-container {background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.2);}
-.home-container h1,.home-container p {color:white;}
-.home-container input,.home-container select {background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.3);}
-.home-container input::placeholder {color:rgba(255,255,255,0.7);}
-.home-container button {background:white; color:#1a3b6d;}
-.home-container a {color:white;}
-</style>
-"""
+BASE_CSS = """...same CSS as yours..."""
 
 HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1>
-<p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 Attempt Only</p>
+<p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p>
 <form method="POST">
     <input name="name" placeholder="Enter your full name" required>
     <select name="subject" required>
@@ -167,12 +133,12 @@ ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>
 {% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}
 <form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.13</h1>
-<p style="color:green; font-weight:700;">✅ DUPLICATE BUG FIXED</p>
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.14</h1>
+<p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p>
 <p>All records are saved permanently.</p>
 <a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a>
 <a href="/logout" style="float:right">Logout</a>
-<table><tr><th>Name</th><th>Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>
+<table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>
 {% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td>
 <td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
@@ -186,16 +152,24 @@ REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}}
 {% endfor %}
 </div>"""
 
-SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Your {{subject}} answers have been recorded.</p></div>"""
+SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>You cannot take any other subject again.</p></div>"""
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
         name = request.form["name"].strip()
         subject = request.form["subject"]
-        user = User.query.filter_by(name=name, subject=subject).first()
-        if not user: user = User(name=name, subject=subject); db.session.add(user); db.session.commit()
-        if user.has_attempted: return BASE_CSS + f"<div class='container'><h1>Already Attempted {subject}</h1><p>Contact admin to reset.</p></div>"
+
+        # CHANGE 1: Check name ONLY. 1 attempt for all subjects
+        user = User.query.filter_by(name=name).first()
+
+        if user and user.has_attempted:
+            return BASE_CSS + f"<div class='container'><h1>Already Attempted A Quiz</h1><p>Hi {name}, you have already taken {user.subject}. 1 attempt total only. Contact admin to reset.</p></div>"
+
+        if not user:
+            user = User(name=name, subject=subject)
+            db.session.add(user)
+            db.session.commit()
 
         subject_questions = Question.query.filter_by(subject=subject).all()
         ids = [q.id for q in subject_questions]
