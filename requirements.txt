@@ -1,6 +1,4 @@
 Flask
 gunicorn
-
-git
 psycopg2-binary
 Flask-SQLAlchemy
