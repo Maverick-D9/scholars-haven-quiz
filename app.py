@@ -1,4 +1,4 @@
-#SCHOLARS HAVEN V2.1 - RESET BUTTONS ADDED 01-SEPT-2026
+#SCHOLARS HAVEN V2.13 - PORT BINDING + WIPE BUTTON
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
