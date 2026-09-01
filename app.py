@@ -1,12 +1,24 @@
+
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
 from datetime import datetime
 import json
+import os
+import random # for shuffling
 
 app = Flask(__name__)
 app.secret_key = "scholars_haven_secret_2026"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///quiz.db'
+
+# FIX 1: Use Postgres on Render, SQLite locally
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+else:
+    DATABASE_URL = 'sqlite:///quiz.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 QUIZ_DURATION = 180 # 3 minutes
@@ -75,18 +87,19 @@ ALL_QUESTIONS = {
     ]
 }
 
-def cleanup_old_records():
-    cutoff = time.time() - (24 * 3600)
-    old_attempts = Attempt.query.filter(Attempt.submitted_at < cutoff).all()
-    for a in old_attempts:
-        db.session.delete(a)
-        user = User.query.get(a.user_id)
-        if user: db.session.delete(user)
-    db.session.commit()
+# FIX 2: REMOVED auto-delete. Commented out so scores don't disappear
+# def cleanup_old_records():
+# cutoff = time.time() - (24 * 3600)
+# old_attempts = Attempt.query.filter(Attempt.submitted_at < cutoff).all()
+# for a in old_attempts:
+# db.session.delete(a)
+# user = User.query.get(a.user_id)
+# if user: db.session.delete(user)
+# db.session.commit()
 
 with app.app_context():
     db.create_all()
-    cleanup_old_records()
+    # cleanup_old_records() # REMOVED
     if Question.query.count() == 0:
         for subject, questions in ALL_QUESTIONS.items():
             for q, opts, a in questions:
@@ -98,7 +111,8 @@ BASE_CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 body {font-family: 'Poppins', sans-serif; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f4f7fb;}
 .container {background:white; padding:30px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15); width:90%; max-width:800px;}
-h1 {color:#1a3b6d; text-align:center; margin-bottom:20px;}
+h1 {color:#1a3b6d; text-align:center; margin-bottom:10px;}
+.user-greet {text-align:center; color:#1a3b6d; font-weight:600; margin-bottom:20px; font-size:18px;}
 input, select, button {width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid #ccc; font-size:16px;}
 button {background:#1a3b6d; color:white; border:none; cursor:pointer; font-weight:600; transition:0.3s;}
 button:hover {background:#0f274d; transform:translateY(-2px);}
@@ -143,6 +157,7 @@ HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home
 <p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a></p></div></body>"""
 
 QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1>
+<div class="user-greet">Hi {{user_name}} 👋</div> <!-- FEATURE 2: Hi Name -->
 <div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div>
 <div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div>
 <form method="POST">
@@ -163,7 +178,7 @@ ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>
 {% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}
 <form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel</h1><p>Records auto-delete after 24 hours</p><a href="/logout">Logout</a>
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel</h1><p>All records are now saved permanently</p><a href="/logout">Logout</a>
 <table><tr><th>Name</th><th>Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>
 {% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td>
 <td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}">Delete</a></td></tr>{% endfor %}</table></div>"""
@@ -182,25 +197,37 @@ SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    cleanup_old_records()
+    # cleanup_old_records() # REMOVED
     if request.method == "POST":
         name = request.form["name"].strip()
         subject = request.form["subject"]
         user = User.query.filter_by(name=name, subject=subject).first()
         if not user: user = User(name=name, subject=subject); db.session.add(user); db.session.commit()
         if user.has_attempted: return BASE_CSS + f"<div class='container'><h1>Already Attempted {subject}</h1><p>Contact admin to reset.</p></div>"
-        session["user_id"] = user.id; session["q_index"] = 0; session["score"] = 0; session["answers"] = {}; session["subject"] = subject
+
+        # FEATURE 1: SHUFFLE - Save shuffled IDs to session
+        subject_questions = Question.query.filter_by(subject=subject).all()
+        ids = [q.id for q in subject_questions]
+        random.shuffle(ids)
+        session["shuffled_ids"] = ids
+
+        session["user_id"] = user.id; session["user_name"] = user.name # FEATURE 2: Save name
+        session["q_index"] = 0; session["score"] = 0; session["answers"] = {}; session["subject"] = subject
         user.start_time = time.time(); db.session.commit(); return redirect("/quiz")
     return render_template_string(HOME_TEMPLATE)
 
 @app.route("/quiz", methods=["GET", "POST"])
 def quiz():
-    if "user_id" not in session: # FIX 1: Safety check
-        return redirect("/")
+    if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
     if time.time() - user.start_time > QUIZ_DURATION: return redirect("/submit")
     time_left = int(QUIZ_DURATION - (time.time() - user.start_time))
-    questions = Question.query.filter_by(subject=session["subject"]).all(); q_index = session["q_index"]
+
+    # FEATURE 1: Load questions in shuffled order
+    question_ids = session["shuffled_ids"]
+    questions = [Question.query.get(qid) for qid in question_ids]
+
+    q_index = session["q_index"]
     if q_index >= len(questions): return redirect("/submit")
     if request.method == "POST":
         ans = request.form["answer"].lower().strip()
@@ -208,16 +235,16 @@ def quiz():
         if ans == questions[q_index].answer: session["score"] += 1
         session["q_index"] += 1; session.modified = True; return redirect("/quiz")
     progress = int((q_index / len(questions)) * 100)
-    return render_template_string(QUIZ_TEMPLATE, subject=session["subject"], question=questions[q_index], q_num=q_index+1, time_left=time_left, progress=progress)
+    return render_template_string(QUIZ_TEMPLATE, subject=session["subject"], question=questions[q_index], q_num=q_index+1, time_left=time_left, progress=progress, user_name=session["user_name"]) # FEATURE 2
 
 @app.route("/submit")
 def submit():
-    if "user_id" not in session: # FIX 1: Safety check
-        return redirect("/")
+    if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
     user.score = session["score"]; user.has_attempted = True; user.submitted_at = time.time()
     attempt = Attempt(user_id=user.id, subject=session["subject"], answers_json=json.dumps(session["answers"]), score=session["score"], submitted_at=time.time())
     db.session.add(attempt); db.session.commit()
+    session.pop("shuffled_ids", None) # Clear shuffle for next attempt
     return render_template_string(SUBMIT_TEMPLATE, name=user.name, subject=session["subject"])
 
 @app.route("/admin", methods=["GET", "POST"])
@@ -231,20 +258,15 @@ def admin():
 @app.route("/admin_panel")
 def admin_panel():
     if not session.get('is_admin'): return redirect("/admin")
-    cleanup_old_records()
+    # cleanup_old_records() # REMOVED
     attempts = Attempt.query.all()
-    clean_attempts = [] # FIX 2: Prevent crash from deleted users
-
+    clean_attempts = []
     for a in attempts:
         user = User.query.get(a.user_id)
-        if user: # Only show if user exists
+        if user:
             a.user_name = user.name
             a.sub_time = datetime.fromtimestamp(a.submitted_at).strftime('%d-%b %H:%M')
             clean_attempts.append(a)
-        else: # Delete orphan attempts
-            db.session.delete(a)
-    db.session.commit()
-
     return render_template_string(ADMIN_TEMPLATE, attempts=clean_attempts)
 
 @app.route("/review/<int:attempt_id>")
@@ -252,10 +274,11 @@ def review(attempt_id):
     if not session.get('is_admin'): return redirect("/admin")
     attempt = Attempt.query.get(attempt_id)
     user = User.query.get(attempt.user_id)
-    questions = Question.query.filter_by(subject=attempt.subject).all()
+    question_ids = json.loads(attempt.answers_json).keys() # Use original order from answers
+    questions = [Question.query.get(qid) for qid in Question.query.filter_by(subject=attempt.subject).all()]
     answers = json.loads(attempt.answers_json)
     review_data = []
-    for i, q in enumerate(questions):
+    for i, q in enumerate(questions[:10]): # only first 10
         q_num = str(i+1)
         review_data.append({
             "num": q_num, "prompt": q.prompt, "correct": q.answer.upper(),
