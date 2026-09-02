@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.16.1 - NO DUPLICATE ATTEMPTS FIX
+# SCHOLARS HAVEN V2.19.4 - ADD 5 NEW SUBJECTS
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-QUIZ_DURATION = 180
+QUIZ_DURATION = 180 # 3 minutes
 ADMIN_PASSWORD = "ScholarsAdmin123"
 
 class User(db.Model):
@@ -95,6 +95,67 @@ ALL_QUESTIONS = {
         ("She said she ___ lost her keys.", "a) has\nb) have\nc) had\nd) having", "c"),
         ("___ you ever been to Abuja?", "a) Has\nb) Have\nc) Had\nd) Having", "b"),
         ("The baby ___ been crying all night.", "a) has\nb) have\nc) had\nd) having", "a")
+    ],
+    # NEW SUBJECTS - 10 Qs EACH
+    "Biology - Cell Structure and Functions": [
+        ("The organelle responsible for protein synthesis is", "a) Mitochondrion\nb) Ribosome\nc) Chloroplast\nd) Nucleus", "b"),
+        ("Plant cells differ from animal cells because they have", "a) Nucleus\nb) Cell membrane\nc) Cell wall\nd) Cytoplasm", "c"),
+        ("The powerhouse of the cell is", "a) Ribosome\nb) Mitochondrion\nc) Lysosome\nd) Golgi body", "b"),
+        ("Which organelle contains chlorophyll?", "a) Mitochondrion\nb) Ribosome\nc) Chloroplast\nd) Vacuole", "c"),
+        ("DNA is found in the", "a) Cytoplasm\nb) Nucleus\nc) Cell wall\nd) Vacuole", "b"),
+        ("The fluid part of the cell is called", "a) Protoplasm\nb) Cytoplasm\nc) Nucleoplasm\nd) Plasma", "b"),
+        ("Diffusion is the movement of molecules from", "a) Low to high concentration\nb) High to low concentration\nc) Equal concentration\nd) Nowhere", "b"),
+        ("The cell membrane is", "a) Impermeable\nb) Semi-permeable\nc) Fully permeable\nd) Non-permeable", "b"),
+        ("Osmosis is the movement of", "a) Water\nb) Salt\nc) Oxygen\nd) Carbon dioxide", "a"),
+        ("The function of vacuole in plant cell is", "a) Protein synthesis\nb) Storage\nc) Respiration\nd) Photosynthesis", "b")
+    ],
+    "Economics - Demand and Supply": [
+        ("The law of demand states that price and quantity demanded are", "a) Directly related\nb) Inversely related\nc) Not related\nd) Equal", "b"),
+        ("A shift in demand curve to the right is caused by", "a) Increase in price\nb) Increase in income\nc) Decrease in income\nd) Decrease in population", "b"),
+        ("Elasticity of demand measures", "a) Price change\nb) Responsiveness of demand to price\nc) Supply change\nd) Income", "b"),
+        ("If price increases and total revenue decreases, demand is", "a) Inelastic\nb) Elastic\nc) Unit elastic\nd) Perfectly elastic", "b"),
+        ("Substitute goods are goods that", "a) Are used together\nb) Can replace each other\nc) Are inferior\nd) Are luxury", "b"),
+        ("Complementary goods are goods that", "a) Replace each other\nb) Are used together\nc) Are normal\nd) Are inferior", "b"),
+        ("The supply curve slopes", "a) Downward\nb) Upward\nc) Horizontal\nd) Vertical", "b"),
+        ("A decrease in supply causes", "a) Price to fall\nb) Price to rise\nc) Quantity to rise\nd) No change", "b"),
+        ("Equilibrium price is where", "a) Demand = Supply\nb) Price is highest\nc) Price is lowest\nd) Supply > Demand", "a"),
+        ("Normal goods are goods whose demand", "a) Falls as income rises\nb) Rises as income rises\nc) Is constant\nd) Is zero", "b")
+    ],
+    "Government - Constitutional Development in Nigeria": [
+        ("The first constitution of Nigeria was", "a) 1960 Constitution\nb) 1963 Constitution\nc) 1922 Clifford Constitution\nd) 1999 Constitution", "c"),
+        ("The 1963 constitution made Nigeria a", "a) Colony\nb) Republic\nc) Protectorate\nd) Monarchy", "b"),
+        ("The Richard Constitution was introduced in", "a) 1946\nb) 1951\nc) 1954\nd) 1960", "a"),
+        ("Federalism in Nigeria was introduced by", "a) 1960 Constitution\nb) 1954 Lyttleton Constitution\nc) 1963 Constitution\nd) 1979 Constitution", "b"),
+        ("The 1999 constitution is currently in use in Nigeria", "a) True\nb) False\nc) Not sure\nd) None", "a"),
+        ("The arm of government that makes laws is", "a) Executive\nb) Legislature\nc) Judiciary\nd) Civil Service", "b"),
+        ("The highest court in Nigeria is", "a) High Court\nb) Court of Appeal\nc) Supreme Court\nd) Sharia Court", "c"),
+        ("The 1960 constitution was a", "a) Republican constitution\nb) Independence constitution\nc) Military constitution\nd) Draft constitution", "b"),
+        ("One feature of parliamentary system is", "a) Separation of powers\nb) Fusion of powers\nc) No prime minister\nd) Military rule", "b"),
+        ("The process of amending the constitution is called", "a) Ratification\nb) Amendment\nc) Review\nd) Revision", "b")
+    ],
+    "Literature in English - Drama": [
+        ("A play performed without spoken words is", "a) Tragedy\nb) Comedy\nc) Mime\nd) Farce", "c"),
+        ("The main character in a play is called", "a) Protagonist\nb) Antagonist\nc) Villain\nd) Heroine", "a"),
+        ("A play with sad ending is", "a) Comedy\nb) Tragedy\nc) Romance\nd) Satire", "b"),
+        ("The person who writes a play is called", "a) Actor\nb) Director\nc) Playwright\nd) Producer", "c"),
+        ("Dialogue in drama means", "a) Song\nb) Conversation between characters\nc) Narration\nd) Dance", "b"),
+        ("The climax of a play is the", "a) Beginning\nb) Highest point of tension\nc) End\nd) Introduction", "b"),
+        ("A play for radio is called", "a) Teleplay\nb) Radio drama\nc) Screenplay\nd) Stage play", "b"),
+        ("Soliloquy is when a character speaks", "a) To another character\nb) To the audience alone\nc) In a song\nd) In a dance", "b"),
+        ("The setting of a play refers to", "a) Characters\nb) Time and place\nc) Plot\nd) Theme", "b"),
+        ("Comedy aims to", "a) Make people sad\nb) Make people laugh\nc) Teach morals only\nd) Scare people", "b")
+    ],
+    "CRS - The Call of Abraham and Covenant": [
+        ("Abraham was originally called", "a) Isaac\nb) Jacob\nc) Abram\nd) Lot", "c"),
+        ("God promised Abraham that his descendants would be as numerous as", "a) Sand of the sea\nb) Stars of heaven\nc) Both a and b\nd) None", "c"),
+        ("The covenant God made with Abraham was sealed with", "a) Baptism\nb) Circumcision\nc) Sacrifice\nd) Prayer", "b"),
+        ("Abraham's wife was", "a) Rebecca\nb) Rachel\nc) Sarah\nd) Leah", "c"),
+        ("Abraham was called from", "a) Egypt\nb) Canaan\nc) Ur of Chaldeans\nd) Babylon", "c"),
+        ("The son of promise to Abraham was", "a) Ishmael\nb) Isaac\nc) Esau\nd) Jacob", "b"),
+        ("God tested Abraham by asking him to sacrifice", "a) Isaac\nb) Ishmael\nc) Lot\nd) Jacob", "a"),
+        ("Abraham is regarded as the father of", "a) Jews only\nb) Christians only\nc) Faith\nd) Kings", "c"),
+        ("The land God promised Abraham was", "a) Egypt\nb) Canaan\nc) Babylon\nd) Assyria", "b"),
+        ("Abraham lived to be", "a) 100 years\nb) 120 years\nc) 150 years\nd) 175 years", "d")
     ]
 }
 
@@ -143,13 +204,14 @@ a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
 </style>
 """
 
-HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Ratio, Percentage and Proportion</option><option>Physics - Dimension, Scalar and Vector</option><option>Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density</option><option>English - Use of Has, Have and Had</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
+subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS.keys()])
+HOME_TEMPLATE = BASE_CSS + f"""<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
 
 QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of 10</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div>"""
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.16.1</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED | NO DUPLICATES</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Subject Taken</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.19.4</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED | 9 SUBJECTS ACTIVE</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Subject Taken</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
 REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}} - {{subject}}</h1><p>Score: {{score}}/10</p><a href="/admin_panel">← Back to Admin</a>{% for q in review_data %}<div class="question-box"><div class="question-title">Q{{q.num}}: {{q.prompt}}</div><p><b>Correct Answer:</b> <span class="correct">{{q.correct}}</span></p><p><b>Student Answer:</b> <span class="{{'correct' if q.is_correct else 'wrong'}}">{{q.student}}</span></p></div>{% endfor %}</div>"""
 
@@ -160,9 +222,9 @@ def init_db():
     try:
         with app.app_context():
             count = load_questions()
-        return BASE_CSS + f"<div class='container'><h1 style='color:green; text-align:center'>Database Initialized ✅</h1><p style='text-align:center; font-size:18px'>Loaded {count} questions successfully.</p><p style='text-align:center; margin-top:20px'><a href='/' style='background:#1a3b6d; color:white; padding:12px 20px; border-radius:8px;'>Go Home</a></p></div>"
+        return BASE_CSS + f"<div class='container'><h1 style='color:green; text-align:center'>Database Initialized ✅</h1><p style='text-align:center; font-size:18px'>Loaded {count} questions across 9 subjects.</p><a href='/' style='background:#1a3b6d; color:white; padding:12px 20px; border-radius:8px;'>Go Home</a></div>"
     except Exception as e:
-        return BASE_CSS + f"<div class='container'><h1 style='color:red; text-align:center'>ERROR</h1><p style='text-align:center'>{str(e)}</p></div>"
+        return BASE_CSS + f"<div class='container'><h1 style='color:red'>ERROR</h1><p>{str(e)}</p></div>"
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -170,10 +232,10 @@ def home():
         name = request.form["name"].strip()
         subject = request.form["subject"]
         user = User.query.filter_by(name=name).first()
-        if user and user.has_attempted: return BASE_CSS + f"<div class='container'><h1>Already Attempted A Quiz</h1><p>Hi {name}, you have already taken {user.subject}. 1 attempt total only. Contact admin to reset.</p></div>"
+        if user and user.has_attempted: return BASE_CSS + f"<div class='container'><h1>Already Attempted A Quiz</h1><p>Hi {name}, you have already taken {user.subject}. 1 attempt total only.</p></div>"
         if not user: user = User(name=name, subject=subject); db.session.add(user); db.session.commit()
         subject_questions = Question.query.filter_by(subject=subject).all()
-        if len(subject_questions) == 0: return BASE_CSS + "<div class='container'><h1>Error</h1><p>No questions found. Click 'CLICK TO INIT DB' on home page first</p></div>"
+        if len(subject_questions) == 0: return BASE_CSS + "<div class='container'><h1>Error</h1><p>No questions found. Click 'CLICK TO INIT DB' first</p></div>"
         ids = [q.id for q in subject_questions]; random.shuffle(ids); session["shuffled_ids"] = ids
         session["user_id"] = user.id; session["user_name"] = user.name; session["q_index"] = 0; session["score"] = 0; session["answers"] = {}; session["subject"] = subject
         user.start_time = time.time(); db.session.commit(); return redirect("/quiz")
@@ -187,29 +249,24 @@ def quiz():
     time_left = int(QUIZ_DURATION - (time.time() - user.start_time))
     question_ids = session["shuffled_ids"]; questions = [Question.query.get(qid) for qid in question_ids]
     q_index = session["q_index"]
-    if q_index >= len(questions): return redirect("/submit")
+    if q_index >= 10: return redirect("/submit")
     if request.method == "POST":
         ans = request.form["answer"].lower().strip(); session["answers"][str(q_index+1)] = ans
         if ans == questions[q_index].answer: session["score"] += 1
         session["q_index"] += 1; session.modified = True; return redirect("/quiz")
-    progress = int((q_index / len(questions)) * 100)
+    progress = int((q_index / 10) * 100)
     return render_template_string(QUIZ_TEMPLATE, subject=session["subject"], question=questions[q_index], q_num=q_index+1, time_left=time_left, progress=progress, user_name=session["user_name"])
 
 @app.route("/submit")
 def submit():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
-
-    # FIX: DELETE ANY OLD ATTEMPTS FOR THIS USER TO PREVENT DUPLICATES
     old_attempts = Attempt.query.filter_by(user_id=user.id).all()
-    for old in old_attempts:
-        db.session.delete(old)
-
+    for old in old_attempts: db.session.delete(old)
     user.score = session["score"]; user.has_attempted = True; user.submitted_at = time.time()
     attempt = Attempt(user_id=user.id, subject=session["subject"], answers_json=json.dumps(session["answers"]), score=session["score"], submitted_at=time.time())
-    db.session.add(attempt); db.session.commit();
-    session.clear() # CLEAR SESSION SO THEY CAN'T REFRESH TO RESUBMIT
-    return render_template_string(SUBMIT_TEMPLATE, name=user.name, subject=session.get("subject"))
+    db.session.add(attempt); db.session.commit(); session.clear()
+    return render_template_string(SUBMIT_TEMPLATE, name=user.name)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
