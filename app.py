@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2 - DARK GOLD GLITTER UI
+# SCHOLARS HAVEN V3.2.1 - DARK GOLD GLITTER UI FULL
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -88,7 +88,6 @@ BASE_CSS = """<style> @import url('https://fonts.googleapis.com/css2?family=Popp
 
 /* DARK SHINY GOLD THEME */
 .home-body {background:#0a0a0a; min-height:100vh; position:relative; overflow:hidden;}
-/* Glitter effect */
 .home-body::before {content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:radial-gradient(2px 2px at 20px 30px, #ffd700, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent), radial-gradient(2px 2px at 50px 160px, #ffd700, transparent), radial-gradient(2px 2px at 120px 40px, #fff, transparent), radial-gradient(3px 3px at 130px 80px, #ffd700, transparent), radial-gradient(2px 2px at 160px 120px, #fff, transparent); background-size:200px 200px; animation:twinkle 3s linear infinite; z-index:0;}
 @keyframes twinkle {0% {opacity:0.3;} 50% {opacity:1;} 100% {opacity:0.3;}}
 
@@ -100,7 +99,13 @@ BASE_CSS = """<style> @import url('https://fonts.googleapis.com/css2?family=Popp
 .home-container button {background:linear-gradient(135deg, #ffd700, #ffb700); color:#000; font-size:18px; font-weight:700; box-shadow:0 4px 15px rgba(255,215,0,0.4);}
 .home-container button:hover {background:linear-gradient(135deg, #fff, #ffd700); transform:translateY(-2px); box-shadow:0 6px 20px rgba(255,215,0,0.6);}
 .home-container a {color:#ffd700; text-decoration:underline;}
-.password-wrapper { display: flex; gap: 8px; align-items: center; }.password-wrapper input { flex: 1; margin: 0; }.icon-btn { padding: 10px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; background: #ffd700; color:#000; width:auto;}.copied { color: #ffd700; font-size: 12px; display: none; }.msg { background: rgba(255,215,0,0.2); padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; color: #ffd700; margin: 15px 0; border:1px solid #ffd700;} </style>"""
+.password-wrapper { display: flex; gap: 8px; align-items: center; }.password-wrapper input { flex: 1; margin: 0; }.icon-btn { padding: 10px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; background: #ffd700; color:#000; width:auto;}.copied { color: #ffd700; font-size: 12px; display: none; }.msg { background: rgba(255,215,0,0.2); padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; color: #ffd700; margin: 15px 0; border:1px solid #ffd700;}
+
+/* Dark Gold Table */
+.dark-table th {background:#ffd700; color:#000; font-weight:700;}
+.dark-table tr {background:#1a1a1a;}
+.dark-table td {color:#e5e5e5; border-color:#333;}
+</style>"""
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS])
 
@@ -108,13 +113,13 @@ LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container hom
 
 REGISTER_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1>📝 Create Account</h1><form method="POST"><input name="name" placeholder="👤 Enter your full name" required>{% if password %}<div class="password-wrapper"><input type="password" id="passwordField" value="{{password}}" readonly><button type="button" class="icon-btn" onclick="togglePassword()" title="Show/Hide">👁️</button><button type="button" class="icon-btn" onclick="copyPassword()" title="Copy">📋</button></div><span id="copiedText" class="copied">Copied!</span><div class="msg">✅ Account Created! Save this password: <b>{{password}}</b></div>{% endif %}<button type="submit">Generate Password</button></form>{% if error %}<div class="msg" style="background:rgba(255,0,0,0.2);">{{error}}</div>{% endif %}<p style="text-align:center; margin-top:15px"><a href="/">Already have account? Login</a></p><script>function togglePassword() {var x = document.getElementById("passwordField"); x.type = x.type === "password"? "text" : "password";} function copyPassword() {var x = document.getElementById("passwordField"); navigator.clipboard.writeText(x.value); document.getElementById("copiedText").style.display = "inline"; setTimeout(() => { document.getElementById("copiedText").style.display = "none"; }, 2000);}</script></div></body>"""
 
-QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of 10</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div>"""
+QUIZ_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet" style="color:#ffd700">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="background:#ffd700; width: {{progress}}%"></div></div><div class="timer" style="background:#ffd700; color:#000">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box" style="background:#1a1a1a; border-left:5px solid #ffd700"><div class="question-title" style="color:#ffd700">Question {{q_num}} of 10</div><div style="color:#e5e5e5">{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label style="background:#1a1a1a; color:#e5e5e5; border:2px solid #333"><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div></body>"""
 
-ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
+ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1 style="color:#ffd700">🔐 Admin Login</h1>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center; border:1px solid #ffd700">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div></body>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v3.2</h1><p style="color:#ffd700; font-weight:700;">✅ DARK GOLD GLITTER UI ACTIVE | PASSWORD LOGIN | 1 ATTEMPT TOTAL</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td>{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td>{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete User</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.1</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI ACTIVE | PASSWORD LOGIN | 1 ATTEMPT TOTAL</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
 
-SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/">Back to Login</a></div>"""
+SUBMIT_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px; color:#e5e5e5">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/" style="display:block; text-align:center; margin-top:20px; background:#ffd700; color:#000; padding:12px; border-radius:8px; font-weight:700">Back to Login</a></div></body>"""
 
 @app.route("/init")
 def init_db():
@@ -125,7 +130,7 @@ def init_db():
         db.session.commit()
         db.create_all()
         count = load_questions()
-    return BASE_CSS + f"<div class='container'><h1 style='color:#ffd700; text-align:center'>Database RESET ✅</h1><p style='text-align:center; font-size:18px; color:#ffd700'>Loaded {count} questions across 9 subjects. All old users deleted.</p><a href='/' style='background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700;'>Go Home</a></div>"
+    return BASE_CSS + f"<body class='home-body'><div class='container home-container'><h1 style='color:#ffd700; text-align:center'>Database RESET ✅</h1><p style='text-align:center; font-size:18px; color:#ffd700'>Loaded {count} questions across 9 subjects. All old users deleted.</p><a href='/' style='background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; display:block; text-align:center'>Go Home</a></div></body>"
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -163,7 +168,7 @@ def home():
 def start_quiz():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
-    if user.has_attempted: return BASE_CSS + f"<div class='container'><h1 style='color:#ffd700'>Already Attempted</h1><p style='color:#e5e5e5'>Hi {user.name.title()}, you have already taken {user.subject}. 1 attempt total only.</p><a href='/logout'>Logout</a></div>"
+    if user.has_attempted: return BASE_CSS + f"<body class='home-body'><div class='container home-container'><h1 style='color:#ffd700'>Already Attempted</h1><p style='color:#e5e5e5'>Hi {user.name.title()}, you have already taken {user.subject}. 1 attempt total only.</p><a href='/logout'>Logout</a></div></body>"
     subject = request.form["subject"]
     subject_questions = Question.query.filter_by(subject=subject).all()
     ids = [q.id for q in subject_questions]; random.shuffle(ids); session["shuffled_ids"] = ids
@@ -171,6 +176,11 @@ def start_quiz():
     user.subject = subject; user.start_time = time.time(); db.session.commit(); return redirect("/quiz")
 
 @app.route("/quiz", methods=["GET", "POST"])
+def quiz():
+    if "user_id" not in session: return redirect("/")
+    user = User.query.get(session["user_id"])
+    if time.time() - user.start_time > QUIZ_DURATION: return redirect("/submit")
+    time_left = int(QUIZ_DURATION - (time.time() - user.start_time))@app.route("/quiz", methods=["GET", "POST"])
 def quiz():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
