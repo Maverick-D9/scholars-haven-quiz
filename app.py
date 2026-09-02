@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.15.4 - SAFE RELOAD
+# SCHOLARS HAVEN V2.15.6 - FLASK 3 FIX
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -101,22 +101,13 @@ ALL_QUESTIONS = {
 def load_questions():
     with app.app_context():
         db.create_all()
-        current_count = Question.query.count()
-        expected_count = sum(len(q) for q in ALL_QUESTIONS.values()) # 40
-        
-        if current_count!= expected_count:
-            print("Reloading questions. Found:", current_count, "Expected:", expected_count)
-            db.session.query(Question).delete()
-            db.session.commit()
-            for subject, questions in ALL_QUESTIONS.items():
-                for q, opts, a in questions:
-                    db.session.add(Question(subject=subject, prompt=q, options=opts, answer=a))
-            db.session.commit()
-            print("Questions reloaded. Total:", Question.query.count())
-
-@app.before_first_request
-def startup():
-    load_questions()
+        db.session.query(Question).delete()
+        db.session.commit()
+        for subject, questions in ALL_QUESTIONS.items():
+            for q, opts, a in questions:
+                db.session.add(Question(subject=subject, prompt=q, options=opts, answer=a))
+        db.session.commit()
+        return Question.query.count()
 
 BASE_CSS = """
 <style>
@@ -154,17 +145,22 @@ a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
 </style>
 """
 
-HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Ratio, Percentage and Proportion</option><option>Physics - Dimension, Scalar and Vector</option><option>Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density</option><option>English - Use of Has, Have and Had</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a></p></div></body>"""
+HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Ratio, Percentage and Proportion</option><option>Physics - Dimension, Scalar and Vector</option><option>Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density</option><option>English - Use of Has, Have and Had</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
 
 QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of 10</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div>"""
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.15.4</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.15.6</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
 REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}} - {{subject}}</h1><p>Score: {{score}}/10</p><a href="/admin_panel">← Back to Admin</a>{% for q in review_data %}<div class="question-box"><div class="question-title">Q{{q.num}}: {{q.prompt}}</div><p><b>Correct Answer:</b> <span class="correct">{{q.correct}}</span></p><p><b>Student Answer:</b> <span class="{{'correct' if q.is_correct else 'wrong'}}">{{q.student}}</span></p></div>{% endfor %}</div>"""
 
 SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>You cannot take any other subject again.</p></div>"""
+
+@app.route("/init") # MANUAL INIT FOR FLASK 3
+def init_db():
+    count = load_questions()
+    return f"<h1 style='text-align:center'>Database Initialized</h1><p style='text-align:center'>Loaded {count} questions. <a href='/'>Go Home</a></p>"
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -175,6 +171,7 @@ def home():
         if user and user.has_attempted: return BASE_CSS + f"<div class='container'><h1>Already Attempted A Quiz</h1><p>Hi {name}, you have already taken {user.subject}. 1 attempt total only. Contact admin to reset.</p></div>"
         if not user: user = User(name=name, subject=subject); db.session.add(user); db.session.commit()
         subject_questions = Question.query.filter_by(subject=subject).all()
+        if len(subject_questions) == 0: return BASE_CSS + "<div class='container'><h1>Error</h1><p>No questions found. Click 'CLICK TO INIT DB' on home page first</p></div>"
         ids = [q.id for q in subject_questions]; random.shuffle(ids); session["shuffled_ids"] = ids
         session["user_id"] = user.id; session["user_name"] = user.name; session["q_index"] = 0; session["score"] = 0; session["answers"] = {}; session["subject"] = subject
         user.start_time = time.time(); db.session.commit(); return redirect("/quiz")
