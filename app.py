@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.16.0 - CSS + POSTGRES FIX
+# SCHOLARS HAVEN V2.16.1 - NO DUPLICATE ATTEMPTS FIX
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -149,7 +149,7 @@ QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subje
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.16.0</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.16.1</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED | NO DUPLICATES</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Subject Taken</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
 REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}} - {{subject}}</h1><p>Score: {{score}}/10</p><a href="/admin_panel">← Back to Admin</a>{% for q in review_data %}<div class="question-box"><div class="question-title">Q{{q.num}}: {{q.prompt}}</div><p><b>Correct Answer:</b> <span class="correct">{{q.correct}}</span></p><p><b>Student Answer:</b> <span class="{{'correct' if q.is_correct else 'wrong'}}">{{q.student}}</span></p></div>{% endfor %}</div>"""
 
@@ -199,10 +199,17 @@ def quiz():
 def submit():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
+
+    # FIX: DELETE ANY OLD ATTEMPTS FOR THIS USER TO PREVENT DUPLICATES
+    old_attempts = Attempt.query.filter_by(user_id=user.id).all()
+    for old in old_attempts:
+        db.session.delete(old)
+
     user.score = session["score"]; user.has_attempted = True; user.submitted_at = time.time()
     attempt = Attempt(user_id=user.id, subject=session["subject"], answers_json=json.dumps(session["answers"]), score=session["score"], submitted_at=time.time())
-    db.session.add(attempt); db.session.commit(); session.pop("shuffled_ids", None)
-    return render_template_string(SUBMIT_TEMPLATE, name=user.name, subject=session["subject"])
+    db.session.add(attempt); db.session.commit();
+    session.clear() # CLEAR SESSION SO THEY CAN'T REFRESH TO RESUBMIT
+    return render_template_string(SUBMIT_TEMPLATE, name=user.name, subject=session.get("subject"))
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -215,7 +222,7 @@ def admin():
 @app.route("/admin_panel")
 def admin_panel():
     if not session.get('is_admin'): return redirect("/admin")
-    attempts = Attempt.query.all(); clean_attempts = []
+    attempts = Attempt.query.order_by(Attempt.submitted_at.desc()).all(); clean_attempts = []
     for a in attempts:
         user = User.query.get(a.user_id)
         if user:
