@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.15.9 - COLUMN SIZE FIX
+# SCHOLARS HAVEN V2.16.0 - CSS + POSTGRES FIX
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -26,7 +26,7 @@ ADMIN_PASSWORD = "ScholarsAdmin123"
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
-    subject = db.Column(db.String(100)) # INCREASED TO 100
+    subject = db.Column(db.String(100))
     has_attempted = db.Column(db.Boolean, default=False)
     score = db.Column(db.Integer, default=0)
     start_time = db.Column(db.Float, default=0)
@@ -34,15 +34,15 @@ class User(db.Model):
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    subject = db.Column(db.String(100)) # INCREASED TO 100
+    subject = db.Column(db.String(100))
     prompt = db.Column(db.Text)
     options = db.Column(db.Text)
-    answer = db.Column(db.String(5)) # INCREASED TO 5
+    answer = db.Column(db.String(5))
 
 class Attempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    subject = db.Column(db.String(100)) # INCREASED TO 100
+    subject = db.Column(db.String(100))
     answers_json = db.Column(db.Text)
     score = db.Column(db.Integer)
     submitted_at = db.Column(db.Float)
@@ -107,7 +107,41 @@ def load_questions():
     db.session.commit()
     return Question.query.count()
 
-BASE_CSS = """[KEEP YOUR SAME CSS FROM BEFORE]"""
+BASE_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+body {font-family: 'Poppins', sans-serif; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f4f7fb;}
+.container {background:white; padding:30px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15); width:90%; max-width:800px;}
+h1 {color:#1a3b6d; text-align:center; margin-bottom:10px;}
+.user-greet {text-align:center; color:#1a3b6d; font-weight:600; margin-bottom:20px; font-size:18px;}
+input, select, button {width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid #ccc; font-size:16px;}
+button {background:#1a3b6d; color:white; border:none; cursor:pointer; font-weight:600; transition:0.3s;}
+button:hover {background:#0f274d; transform:translateY(-2px);}
+.timer {background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}
+.question-box {background:#f8f9ff; padding:20px; border-radius:12px; border-left:5px solid #1a3b6d; margin-bottom:20px;}
+.question-title {font-size:20px; font-weight:600; color:#1a3b6d; margin-bottom:15px;}
+.options label {display:block; background:white; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #e0e0e0; cursor:pointer; transition:0.2s; font-size:16px;}
+.options label:hover {border-color:#1a3b6d; background:#f0f4ff;}
+.options input[type="radio"] {display:none;}
+.options label:has(input:checked) {border-color:#1a3b6d; background:#e8eeff; font-weight:700;}
+.progress {height:8px; background:#e0e0e0; border-radius:10px; margin-bottom:20px;}
+.progress-bar {height:8px; background:#1a3b6d; border-radius:10px; transition:width 0.3s;}
+table {width:100%; border-collapse: collapse; margin-top:20px; font-size:14px;}
+th, td {padding:10px; border:1px solid #ddd; text-align:center;}
+th {background:#1a3b6d; color:white;}
+a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
+.correct {color:green; font-weight:700;}
+.wrong {color:red; font-weight:700;}
+.home-body {background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1a3b6d); background-size: 400% 400%; animation: gradient 15s ease infinite;}
+@keyframes gradient {0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;}}
+.home-container {background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.2);}
+.home-container h1,.home-container p {color:white;}
+.home-container input,.home-container select {background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.3);}
+.home-container input::placeholder {color:rgba(255,255,255,0.7);}
+.home-container button {background:white; color:#1a3b6d;}
+.home-container a {color:white;}
+</style>
+"""
 
 HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Ratio, Percentage and Proportion</option><option>Physics - Dimension, Scalar and Vector</option><option>Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density</option><option>English - Use of Has, Have and Had</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
 
@@ -115,7 +149,7 @@ QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subje
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.15.9</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.16.0</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
 REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}} - {{subject}}</h1><p>Score: {{score}}/10</p><a href="/admin_panel">← Back to Admin</a>{% for q in review_data %}<div class="question-box"><div class="question-title">Q{{q.num}}: {{q.prompt}}</div><p><b>Correct Answer:</b> <span class="correct">{{q.correct}}</span></p><p><b>Student Answer:</b> <span class="{{'correct' if q.is_correct else 'wrong'}}">{{q.student}}</span></p></div>{% endfor %}</div>"""
 
@@ -126,9 +160,9 @@ def init_db():
     try:
         with app.app_context():
             count = load_questions()
-        return f"<h1 style='text-align:center; color:green'>Database Initialized</h1><p style='text-align:center'>Loaded {count} questions. <a href='/'>Go Home</a></p>"
+        return BASE_CSS + f"<div class='container'><h1 style='color:green; text-align:center'>Database Initialized ✅</h1><p style='text-align:center; font-size:18px'>Loaded {count} questions successfully.</p><p style='text-align:center; margin-top:20px'><a href='/' style='background:#1a3b6d; color:white; padding:12px 20px; border-radius:8px;'>Go Home</a></p></div>"
     except Exception as e:
-        return f"<h1 style='text-align:center; color:red'>ERROR</h1><p style='text-align:center'>{str(e)}</p>"
+        return BASE_CSS + f"<div class='container'><h1 style='color:red; text-align:center'>ERROR</h1><p style='text-align:center'>{str(e)}</p></div>"
 
 @app.route("/", methods=["GET", "POST"])
 def home():
