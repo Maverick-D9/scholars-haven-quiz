@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.0.0 - REGISTER + PASSWORD SYSTEM
+# SCHOLARS HAVEN V3.0.1 - REGISTER + PASSWORD SYSTEM - FIXED
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -27,7 +27,7 @@ ADMIN_PASSWORD = "ScholarsAdmin123"
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(20), nullable=False) # <-- NEW
+    password = db.Column(db.String(20), nullable=False)
     subject = db.Column(db.String(100))
     has_attempted = db.Column(db.Boolean, default=False)
     score = db.Column(db.Integer, default=0)
@@ -62,15 +62,102 @@ ALL_QUESTIONS = {
         ("If 3/4 of a number is 60, what is the number?", "a) 70\nb) 75\nc) 80\nd) 90", "c"),
         ("What is the simple interest on 50000 for 2 years at 4% per annum?", "a) 2000\nb) 4000\nc) 5000\nd) 8000", "b")
     ],
-    #... KEEP ALL YOUR OTHER 8 SUBJECTS HERE...
-    "Physics - Dimension, Scalar and Vector": [],
-    "Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density": [],
-    "English - Use of Has, Have and Had": [],
-    "Biology - Cell Structure and Functions": [],
-    "Economics - Demand and Supply": [],
-    "Government - Constitutional Development in Nigeria": [],
-    "Literature in English - Drama": [],
-    "CRS - The Call of Abraham and Covenant": []
+    "Physics - Dimension, Scalar and Vector": [
+        ("Which of the following is a scalar quantity?", "a) Force\nb) Velocity\nc) Mass\nd) Displacement", "c"),
+        ("The dimension of force is", "a) MLT^-1\nb) MLT^-2\nc) ML^2T^-2\nd) ML^-1T^-2", "b"),
+        ("Which of these is a vector quantity?", "a) Energy\nb) Power\nc) Momentum\nd) Temperature", "c"),
+        ("The dimension of pressure is", "a) ML^-1T^-2\nb) MLT^-2\nc) ML^2T^-2\nd) ML^-2T^-2", "a"),
+        ("Speed and velocity differ because", "a) Speed is scalar, velocity is vector\nb) Speed is vector, velocity is scalar\nc) Both are scalars\nd) Both are vectors", "a"),
+        ("Which of the following has the same dimension as energy?", "a) Force\nb) Power\nc) Work\nd) Momentum", "c"),
+        ("The dimension of acceleration is", "a) LT^-1\nb) LT^-2\nc) L^2T^-2\nd) L^-1T^2", "b"),
+        ("Which of the following pairs are both vectors?", "a) Mass and Weight\nb) Force and Acceleration\nc) Work and Energy\nd) Distance and Speed", "b"),
+        ("The dimension of frequency is", "a) T^-1\nb) T\nc) LT^-1\nd) L^-1T", "a"),
+        ("A quantity that has magnitude but no direction is called a ___", "a) Vector\nb) Scalar\nc) Tensor\nd) Matrix", "b")
+    ],
+    "Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density": [
+        ("What is the number of moles in 44g of CO2? [C=12, O=16]", "a) 0.5\nb) 1.0\nc) 1.5\nd) 2.0", "b"),
+        ("The empirical formula of a compound with 40% C, 6.7% H, 53.3% O is", "a) CH2O\nb) C2H4O2\nc) C6H12O6\nd) CHO", "a"),
+        ("Vapour density is defined as", "a) Mass of gas / Mass of hydrogen\nb) Density of gas / Density of hydrogen\nc) Molar mass / 2\nd) 2 x Molar mass", "c"),
+        ("How many molecules are in 1 mole of a substance?", "a) 6.02 x 10^22\nb) 6.02 x 10^23\nc) 3.01 x 10^23\nd) 1.00 x 10^24", "b"),
+        ("The molecular formula of a compound with empirical formula CH2O and molar mass 180 is", "a) CH2O\nb) C2H4O2\nc) C3H6O3\nd) C6H12O6", "d"),
+        ("If the vapour density of a gas is 22, what is its molar mass?", "a) 11\nb) 22\nc) 44\nd) 88", "c"),
+        ("What is the empirical formula of C6H12O6?", "a) C6H12O6\nb) C3H6O3\nc) C2H4O2\nd) CH2O", "d"),
+        ("1 mole of any gas at STP occupies", "a) 11.2 dm^3\nb) 22.4 dm^3\nc) 44.8 dm^3\nd) 24.0 dm^3", "b"),
+        ("The mass of 0.5 moles of NaCl is [Na=23, Cl=35.5]", "a) 29.25g\nb) 58.5g\nc) 117g\nd) 23g", "a"),
+        ("A gas has vapour density 16. Its molecular mass is", "a) 8\nb) 16\nc) 32\nd) 64", "c")
+    ],
+    "English - Use of Has, Have and Had": [
+        ("She ___ finished her assignment before I arrived.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("They ___ three cars.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("He ___ a meeting yesterday.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("The students ___ submitted their forms.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("By next year, I ___ graduated.", "a) has\nb) have\nc) will have\nd) had", "c"),
+        ("My father ___ been a teacher for 20 years.", "a) has\nb) have\nc) had\nd) having", "a"),
+        ("We ___ not seen him since Monday.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("She said she ___ lost her keys.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("___ you ever been to Abuja?", "a) Has\nb) Have\nc) Had\nd) Having", "b"),
+        ("The baby ___ been crying all night.", "a) has\nb) have\nc) had\nd) having", "a")
+    ],
+    "Biology - Cell Structure and Functions": [
+        ("The organelle responsible for protein synthesis is", "a) Mitochondrion\nb) Ribosome\nc) Chloroplast\nd) Nucleus", "b"),
+        ("Plant cells differ from animal cells because they have", "a) Nucleus\nb) Cell membrane\nc) Cell wall\nd) Cytoplasm", "c"),
+        ("The powerhouse of the cell is", "a) Ribosome\nb) Mitochondrion\nc) Lysosome\nd) Golgi body", "b"),
+        ("Which organelle contains chlorophyll?", "a) Mitochondrion\nb) Ribosome\nc) Chloroplast\nd) Vacuole", "c"),
+        ("DNA is found in the", "a) Cytoplasm\nb) Nucleus\nc) Cell wall\nd) Vacuole", "b"),
+        ("The fluid part of the cell is called", "a) Protoplasm\nb) Cytoplasm\nc) Nucleoplasm\nd) Plasma", "b"),
+        ("Diffusion is the movement of molecules from", "a) Low to high concentration\nb) High to low concentration\nc) Equal concentration\nd) Nowhere", "b"),
+        ("The cell membrane is", "a) Impermeable\nb) Semi-permeable\nc) Fully permeable\nd) Non-permeable", "b"),
+        ("Osmosis is the movement of", "a) Water\nb) Salt\nc) Oxygen\nd) Carbon dioxide", "a"),
+        ("The function of vacuole in plant cell is", "a) Protein synthesis\nb) Storage\nc) Respiration\nd) Photosynthesis", "b")
+    ],
+    "Economics - Demand and Supply": [
+        ("The law of demand states that price and quantity demanded are", "a) Directly related\nb) Inversely related\nc) Not related\nd) Equal", "b"),
+        ("A shift in demand curve to the right is caused by", "a) Increase in price\nb) Increase in income\nc) Decrease in income\nd) Decrease in population", "b"),
+        ("Elasticity of demand measures", "a) Price change\nb) Responsiveness of demand to price\nc) Supply change\nd) Income", "b"),
+        ("If price increases and total revenue decreases, demand is", "a) Inelastic\nb) Elastic\nc) Unit elastic\nd) Perfectly elastic", "b"),
+        ("Substitute goods are goods that", "a) Are used together\nb) Can replace each other\nc) Are inferior\nd) Are luxury", "b"),
+        ("Complementary goods are goods that", "a) Replace each other\nb) Are used together\nc) Are normal\nd) Are inferior", "b"),
+        ("The supply curve slopes", "a) Downward\nb) Upward\nc) Horizontal\nd) Vertical", "b"),
+        ("A decrease in supply causes", "a) Price to fall\nb) Price to rise\nc) Quantity to rise\nd) No change", "b"),
+        ("Equilibrium price is where", "a) Demand = Supply\nb) Price is highest\nc) Price is lowest\nd) Supply > Demand", "a"),
+        ("Normal goods are goods whose demand", "a) Falls as income rises\nb) Rises as income rises\nc) Is constant\nd) Is zero", "b")
+    ],
+    "Government - Constitutional Development in Nigeria": [
+        ("The first constitution of Nigeria was", "a) 1960 Constitution\nb) 1963 Constitution\nc) 1922 Clifford Constitution\nd) 1999 Constitution", "c"),
+        ("The 1963 constitution made Nigeria a", "a) Colony\nb) Republic\nc) Protectorate\nd) Monarchy", "b"),
+        ("The Richard Constitution was introduced in", "a) 1946\nb) 1951\nc) 1954\nd) 1960", "a"),
+        ("Federalism in Nigeria was introduced by", "a) 1960 Constitution\nb) 1954 Lyttleton Constitution\nc) 1963 Constitution\nd) 1979 Constitution", "b"),
+        ("The 1999 constitution is currently in use in Nigeria", "a) True\nb) False\nc) Not sure\nd) None", "a"),
+        ("The arm of government that makes laws is", "a) Executive\nb) Legislature\nc) Judiciary\nd) Civil Service", "b"),
+        ("The highest court in Nigeria is", "a) High Court\nb) Court of Appeal\nc) Supreme Court\nd) Sharia Court", "c"),
+        ("The 1960 constitution was a", "a) Republican constitution\nb) Independence constitution\nc) Military constitution\nd) Draft constitution", "b"),
+        ("One feature of parliamentary system is", "a) Separation of powers\nb) Fusion of powers\nc) No prime minister\nd) Military rule", "b"),
+        ("The process of amending the constitution is called", "a) Ratification\nb) Amendment\nc) Review\nd) Revision", "b")
+    ],
+    "Literature in English - Drama": [
+        ("A play performed without spoken words is", "a) Tragedy\nb) Comedy\nc) Mime\nd) Farce", "c"),
+        ("The main character in a play is called", "a) Protagonist\nb) Antagonist\nc) Villain\nd) Heroine", "a"),
+        ("A play with sad ending is", "a) Comedy\nb) Tragedy\nc) Romance\nd) Satire", "b"),
+        ("The person who writes a play is called", "a) Actor\nb) Director\nc) Playwright\nd) Producer", "c"),
+        ("Dialogue in drama means", "a) Song\nb) Conversation between characters\nc) Narration\nd) Dance", "b"),
+        ("The climax of a play is the", "a) Beginning\nb) Highest point of tension\nc) End\nd) Introduction", "b"),
+        ("A play for radio is called", "a) Teleplay\nb) Radio drama\nc) Screenplay\nd) Stage play", "b"),
+        ("Soliloquy is when a character speaks", "a) To another character\nb) To the audience alone\nc) In a song\nd) In a dance", "b"),
+        ("The setting of a play refers to", "a) Characters\nb) Time and place\nc) Plot\nd) Theme", "b"),
+        ("Comedy aims to", "a) Make people sad\nb) Make people laugh\nc) Teach morals only\nd) Scare people", "b")
+    ],
+    "CRS - The Call of Abraham and Covenant": [
+        ("Abraham was originally called", "a) Isaac\nb) Jacob\nc) Abram\nd) Lot", "c"),
+        ("God promised Abraham that his descendants would be as numerous as", "a) Sand of the sea\nb) Stars of heaven\nc) Both a and b\nd) None", "c"),
+        ("The covenant God made with Abraham was sealed with", "a) Baptism\nb) Circumcision\nc) Sacrifice\nd) Prayer", "b"),
+        ("Abraham's wife was", "a) Rebecca\nb) Rachel\nc) Sarah\nd) Leah", "c"),
+        ("Abraham was called from", "a) Egypt\nb) Canaan\nc) Ur of Chaldeans\nd) Babylon", "c"),
+        ("The son of promise to Abraham was", "a) Ishmael\nb) Isaac\nc) Esau\nd) Jacob", "b"),
+        ("God tested Abraham by asking him to sacrifice", "a) Isaac\nb) Ishmael\nc) Lot\nd) Jacob", "a"),
+        ("Abraham is regarded as the father of", "a) Jews only\nb) Christians only\nc) Faith\nd) Kings", "c"),
+        ("The land God promised Abraham was", "a) Egypt\nb) Canaan\nc) Babylon\nd) Assyria", "b"),
+        ("Abraham lived to be", "a) 100 years\nb) 120 years\nc) 150 years\nd) 175 years", "d")
+    ]
 }
 
 def load_questions():
@@ -89,9 +176,9 @@ BASE_CSS = """<style> @import url('https://fonts.googleapis.com/css2?family=Popp
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS.keys()])
 
-LOGIN_TEMPLATE = BASE_CSS + f"""<body class="home-body"><div class="container home-container">
-<img src="{{{{ url_for('static', filename='raven.png') }}}}" class="logo" alt="Scholars Haven Raven Logo">
-<h1>Scholars'Haven Login</h1>{% if error %}<p style="color:yellow; text-align:center">{{{{error}}}}</p>{% endif %}
+LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container">
+<img src="{{ url_for('static', filename='raven.png') }}" class="logo" alt="Scholars Haven Raven Logo">
+<h1>Scholars'Haven Login</h1>{% if error %}<p style="color:yellow; text-align:center">{{error}}</p>{% endif %}
 <form method="POST"><input name="name" placeholder="Enter your full name" required><input type="password" name="password" placeholder="Enter your password" required><button>Login</button></form>
 <p style="text-align:center; margin-top:15px"><a href="/register">New Student? Register Here</a> | <a href="/admin">Admin Login</a></p></div></body>"""
 
@@ -117,14 +204,14 @@ QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subje
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v3.0.0</h1><p style="color:green; font-weight:700;">✅ PASSWORD LOGIN ACTIVE | 1 ATTEMPT TOTAL</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name}}</td><td>{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td>{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete User</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v3.0.1</h1><p style="color:green; font-weight:700;">✅ PASSWORD LOGIN ACTIVE | 1 ATTEMPT TOTAL | 9 SUBJECTS</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td>{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td>{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete User</a></td></tr>{% endfor %}</table></div>"""
 
 SUBMIT_TEMPLATE = BASE_CSS + """<div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/">Back to Login</a></div>"""
 
 @app.route("/init")
 def init_db():
     with app.app_context(): count = load_questions()
-    return BASE_CSS + f"<div class='container'><h1 style='color:green; text-align:center'>Database Initialized ✅</h1><p style='text-align:center; font-size:18px'>Loaded {count} questions. Old users deleted.</p><a href='/' style='background:#1a3b6d; color:white; padding:12px 20px; border-radius:8px;'>Go Home</a></div>"
+    return BASE_CSS + f"<div class='container'><h1 style='color:green; text-align:center'>Database Initialized ✅</h1><p style='text-align:center; font-size:18px'>Loaded {count} questions across 9 subjects. Old users deleted.</p><a href='/' style='background:#1a3b6d; color:white; padding:12px 20px; border-radius:8px;'>Go Home</a></div>"
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -154,10 +241,12 @@ def register():
 @app.route("/home")
 def home():
     if "user_id" not in session: return redirect("/")
-    return render_template_string(BASE_CSS + f"""<body class="home-body"><div class="container home-container">
-<h1>Welcome {{session['user_name'].title()}}</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p>
+    user_name = session['user_name'].title()
+    html = BASE_CSS + f"""<body class="home-body"><div class="container home-container">
+<h1>Welcome {user_name}</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p>
 <form method="POST" action="/start_quiz"><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form>
-<p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p></div></body>""")
+<p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p></div></body>"""
+    return render_template_string(html)
 
 @app.route("/start_quiz", methods=["POST"])
 def start_quiz():
@@ -184,7 +273,7 @@ def quiz():
         if ans == questions[q_index].answer: session["score"] += 1
         session["q_index"] += 1; session.modified = True; return redirect("/quiz")
     progress = int((q_index / 10) * 100)
-    return render_template_string(QUIZ_TEMPLATE, subject=session["subject"], question=questions[q_index], q_num=q_index+1, time_left=time_left, progress=progress, user_name=session["user_name"])
+    return render_template_string(QUIZ_TEMPLATE, subject=session["subject"], question=questions[q_index], q_num=q_index+1, time_left=time_left, progress=progress, user_name=session["user_name"].title())
 
 @app.route("/submit")
 def submit():
