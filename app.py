@@ -7,7 +7,7 @@ import json
 import os
 import random
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static') # <-- CHANGED: added static_folder
 app.secret_key = "scholars_haven_secret_2026"
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -174,6 +174,7 @@ BASE_CSS = """
 body {font-family: 'Poppins', sans-serif; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#f4f7fb;}
 .container {background:white; padding:30px; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.15); width:90%; max-width:800px;}
 h1 {color:#1a3b6d; text-align:center; margin-bottom:10px;}
+.logo {width:120px; display:block; margin:0 auto 15px;} /* <-- ADDED LOGO CSS */
 .user-greet {text-align:center; color:#1a3b6d; font-weight:600; margin-bottom:20px; font-size:18px;}
 input, select, button {width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid #ccc; font-size:16px;}
 button {background:#1a3b6d; color:white; border:none; cursor:pointer; font-weight:600; transition:0.3s;}
@@ -205,7 +206,9 @@ a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
 """
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS.keys()])
-HOME_TEMPLATE = BASE_CSS + f"""<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
+HOME_TEMPLATE = BASE_CSS + f"""<body class="home-body"><div class="container home-container">
+<img src="{{{{ url_for('static', filename='raven.png') }}}}" class="logo" alt="Scholars Haven Raven Logo"> <!-- <-- ADDED LOGO -->
+<h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a> | <a href="/init" style="color:yellow; font-weight:700;">CLICK TO INIT DB</a></p></div></body>"""
 
 QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of 10</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div>"""
 
