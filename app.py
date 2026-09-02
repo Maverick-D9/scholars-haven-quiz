@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.14 - 1 ATTEMPT TOTAL FOR ALL SUBJECTS
+# SCHOLARS HAVEN V2.14.3 - 1 ATTEMPT TOTAL FOR ALL SUBJECTS
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
