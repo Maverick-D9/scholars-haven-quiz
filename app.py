@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V2.14.3 - 1 ATTEMPT TOTAL FOR ALL SUBJECTS
+# SCHOLARS HAVEN V2.15 - 1 ATTEMPT TOTAL FOR ALL SUBJECTS
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -48,41 +48,53 @@ class Attempt(db.Model):
     submitted_at = db.Column(db.Float)
 
 ALL_QUESTIONS = {
-    "Maths - Law of Indices": [
-        ("Simplify: 2^3 x 2^4", "a) 2^7\nb) 2^12\nc) 4^7\nd) 8^7", "a"),
-        ("Express 1/32 as a power of 2", "a) 2^-3\nb) 2^-4\nc) 2^-5\nd) 2^-6", "c"),
-        ("If 3^x = 27, what is x?", "a) 2\nb) 3\nc) 4\nd) 9", "b"),
-        ("Simplify: (5^2)^3", "a) 5^5\nb) 5^6\nc) 10^6\nd) 25^3", "b"),
-        ("Evaluate: 8^(2/3)", "a) 2\nb) 3\nc) 4\nd) 8", "c"),
-        ("Simplify: a^5 / a^2", "a) a^3\nb) a^7\nc) a^10\nd) a^2", "a"),
-        ("If 2^n = 64, find n", "a) 4\nb) 5\nc) 6\nd) 8", "c"),
-        ("Simplify: (2x^3)^2", "a) 2x^6\nb) 4x^5\nc) 4x^6\nd) 2x^5", "c"),
-        ("Express 0.125 as a power of 2", "a) 2^-1\nb) 2^-2\nc) 2^-3\nd) 2^-4", "c"),
-        ("Find the value of: 9^(1/2)", "a) 3\nb) 9\nc) 18\nd) 81", "a")
+    "Maths - Ratio, Percentage and Proportion": [
+        ("If A:B = 3:5 and B:C = 10:7, find A:C", "a) 3:7\nb) 6:7\nc) 30:35\nd) 5:7", "b"),
+        ("What percentage of 80 is 20?", "a) 20%\nb) 25%\nc) 30%\nd) 40%", "b"),
+        ("A man shared 9000 in ratio 2:3:4. How much did the second person get?", "a) 2000\nb) 3000\nc) 4000\nd) 5000", "b"),
+        ("Increase 250 by 12%", "a) 270\nb) 280\nc) 290\nd) 300", "b"),
+        ("If 5 men can build a wall in 8 days, how long will 8 men take?", "a) 3 days\nb) 4 days\nc) 5 days\nd) 6 days", "c"),
+        ("The ratio of boys to girls in a class is 4:3. If there are 28 boys, how many girls?", "a) 18\nb) 21\nc) 24\nd) 27", "b"),
+        ("A price was reduced from 4000 to 3400. What is the percentage decrease?", "a) 10%\nb) 15%\nc) 20%\nd) 25%", "b"),
+        ("Divide 56 in the ratio 3:5", "a) 20, 36\nb) 21, 35\nc) 22, 34\nd) 24, 32", "b"),
+        ("If 3/4 of a number is 60, what is the number?", "a) 70\nb) 75\nc) 80\nd) 90", "c"),
+        ("What is the simple interest on 50000 for 2 years at 4% per annum?", "a) 2000\nb) 4000\nc) 5000\nd) 8000", "b")
     ],
-    "English - Concord": [
-        ("The list of items ___ on the table.", "a) are\nb) is\nc) were\nd) have", "b"),
-        ("Neither John nor his friends ___ present.", "a) is\nb) are\nc) was\nd) were", "b"),
-        ("Each of the students ___ to submit an assignment.", "a) have\nb) has\nc) are\nd) were", "b"),
-        ("The committee ___ divided on the issue.", "a) is\nb) are\nc) was\nd) has", "b"),
-        ("A number of students ___ absent today.", "a) is\nb) was\nc) are\nd) has", "c"),
-        ("Either the manager or the clerks ___ to sign.", "a) has\nb) have\nc) is\nd) was", "b"),
-        ("Bread and butter ___ my breakfast.", "a) are\nb) is\nc) were\nd) have", "b"),
-        ("The news ___ shocking.", "a) are\nb) were\nc) is\nd) have", "c"),
-        ("Everyone of us ___ a responsibility.", "a) have\nb) has\nc) are\nd) were", "b"),
-        ("Ten thousand naira ___ a lot of money.", "a) are\nb) were\nc) is\nd) have", "c")
+    "Physics - Dimension, Scalar and Vector": [
+        ("Which of the following is a scalar quantity?", "a) Force\nb) Velocity\nc) Mass\nd) Displacement", "c"),
+        ("The dimension of force is", "a) MLT^-1\nb) MLT^-2\nc) ML^2T^-2\nd) ML^-1T^-2", "b"),
+        ("Which of these is a vector quantity?", "a) Energy\nb) Power\nc) Momentum\nd) Temperature", "c"),
+        ("The dimension of pressure is", "a) ML^-1T^-2\nb) MLT^-2\nc) ML^2T^-2\nd) ML^-2T^-2", "a"),
+        ("Speed and velocity differ because", "a) Speed is scalar, velocity is vector\nb) Speed is vector, velocity is scalar\nc) Both are scalars\nd) Both are vectors", "a"),
+        ("Which of the following has the same dimension as energy?", "a) Force\nb) Power\nc) Work\nd) Momentum", "c"),
+        ("The dimension of acceleration is", "a) LT^-1\nb) LT^-2\nc) L^2T^-2\nd) L^-1T^2", "b"),
+        ("Which of the following pairs are both vectors?", "a) Mass and Weight\nb) Force and Acceleration\nc) Work and Energy\nd) Distance and Speed", "b"),
+        ("The dimension of frequency is", "a) T^-1\nb) T\nc) LT^-1\nd) L^-1T", "a"),
+        ("A quantity that has magnitude but no direction is called a ___", "a) Vector\nb) Scalar\nc) Tensor\nd) Matrix", "b")
     ],
-    "Chemistry - Atom, Molecule, Ion": [
-        ("Which of the following represents an atom?", "a) H2\nb) Na+\nc) H2O\nd) Na", "d"),
-        ("A molecule of water contains ___ atoms.", "a) 1\nb) 2\nc) 3\nd) 4", "c"),
-        ("Na+ is an example of a ___", "a) Molecule\nb) Atom\nc) Cation\nd) Anion", "c"),
-        ("Which particle has no charge?", "a) Proton\nb) Electron\nc) Neutron\nd) Ion", "c"),
-        ("Cl- is formed when chlorine ___ an electron.", "a) loses\nb) shares\nc) gains\nd) destroys", "c"),
-        ("The smallest particle of a compound that can exist is a ___", "a) Atom\nb) Molecule\nc) Ion\nd) Element", "b"),
-        ("How many atoms are in CO2?", "a) 1\nb) 2\nc) 3\nd) 4", "c"),
-        ("Which of these is NOT an ion?", "a) Ca2+\nb) O2-\nc) H2O\nd) K+", "c"),
-        ("An atom becomes a cation by ___", "a) gaining electrons\nb) losing electrons\nc) gaining protons\nd) losing neutrons", "b"),
-        ("H2SO4 is a ___", "a) Atom\nb) Ion\nc) Molecule\nd) Element", "c")
+    "Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density": [
+        ("What is the number of moles in 44g of CO2? [C=12, O=16]", "a) 0.5\nb) 1.0\nc) 1.5\nd) 2.0", "b"),
+        ("The empirical formula of a compound with 40% C, 6.7% H, 53.3% O is", "a) CH2O\nb) C2H4O2\nc) C6H12O6\nd) CHO", "a"),
+        ("Vapour density is defined as", "a) Mass of gas / Mass of hydrogen\nb) Density of gas / Density of hydrogen\nc) Molar mass / 2\nd) 2 x Molar mass", "c"),
+        ("How many molecules are in 1 mole of a substance?", "a) 6.02 x 10^22\nb) 6.02 x 10^23\nc) 3.01 x 10^23\nd) 1.00 x 10^24", "b"),
+        ("The molecular formula of a compound with empirical formula CH2O and molar mass 180 is", "a) CH2O\nb) C2H4O2\nc) C3H6O3\nd) C6H12O6", "d"),
+        ("If the vapour density of a gas is 22, what is its molar mass?", "a) 11\nb) 22\nc) 44\nd) 88", "c"),
+        ("What is the empirical formula of C6H12O6?", "a) C6H12O6\nb) C3H6O3\nc) C2H4O2\nd) CH2O", "d"),
+        ("1 mole of any gas at STP occupies", "a) 11.2 dm^3\nb) 22.4 dm^3\nc) 44.8 dm^3\nd) 24.0 dm^3", "b"),
+        ("The mass of 0.5 moles of NaCl is [Na=23, Cl=35.5]", "a) 29.25g\nb) 58.5g\nc) 117g\nd) 23g", "a"),
+        ("A gas has vapour density 16. Its molecular mass is", "a) 8\nb) 16\nc) 32\nd) 64", "c")
+    ],
+    "English - Use of Has, Have and Had": [
+        ("She ___ finished her assignment before I arrived.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("They ___ three cars.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("He ___ a meeting yesterday.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("The students ___ submitted their forms.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("By next year, I ___ graduated.", "a) has\nb) have\nc) will have\nd) had", "c"),
+        ("My father ___ been a teacher for 20 years.", "a) has\nb) have\nc) had\nd) having", "a"),
+        ("We ___ not seen him since Monday.", "a) has\nb) have\nc) had\nd) having", "b"),
+        ("She said she ___ lost her keys.", "a) has\nb) have\nc) had\nd) having", "c"),
+        ("___ you ever been to Abuja?", "a) Has\nb) Have\nc) Had\nd) Having", "b"),
+        ("The baby ___ been crying all night.", "a) has\nb) have\nc) had\nd) having", "a")
     ]
 }
 
@@ -130,13 +142,13 @@ a {color:#1a3b6d; text-decoration:none; font-weight:600; margin-right:10px;}
 </style>
 """
 
-HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Law of Indices</option><option>English - Concord</option><option>Chemistry - Atom, Molecule, Ion</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a></p></div></body>"""
+HOME_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Scholars'Haven Quiz Space</h1><p style="text-align:center">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST"><input name="name" placeholder="Enter your full name" required><select name="subject" required><option value="" disabled selected>Select Subject</option><option>Maths - Ratio, Percentage and Proportion</option><option>Physics - Dimension, Scalar and Vector</option><option>Chemistry - Mole, Empirical Formula, Molecular Formula, Vapour Density</option><option>English - Use of Has, Have and Had</option></select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/admin">Admin Login</a></p></div></body>"""
 
 QUIZ_TEMPLATE = BASE_CSS + """<div class="container"><h1>Scholars'Haven: {{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="progress"><div class="progress-bar" style="width: {{progress}}%"></div></div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of 10</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time = {{time_left}};let timer = setInterval(()=>{time--;document.getElementById('timer').innerText = time;if(time <= 0){clearInterval(timer); document.querySelector('form').submit();}}, 1000)</script></div>"""
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Login</h1>{% if error %}<p style="color:red; text-align:center">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.14</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
+ADMIN_TEMPLATE = BASE_CSS + """<div class="container"><h1>Admin Panel v2.15</h1><p style="color:green; font-weight:700;">✅ 1 ATTEMPT TOTAL ENFORCED</p><p>All records are saved permanently.</p><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS. Cannot be undone.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; display:inline-block; margin-bottom:15px; font-weight:700;">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="float:right">Logout</a><table><tr><th>Name</th><th>First Subject</th><th>Score</th><th>Time Submitted</th><th>Actions</th></tr>{% for a in attempts %}<tr><td>{{a.user_name}}</td><td>{{a.subject}}</td><td>{{a.score}}/10</td><td>{{a.sub_time}}</td><td><a href="/review/{{a.id}}">Review</a> <a href="/reset/{{a.id}}" style="color:#ff4757; font-weight:700;">Reset</a></td></tr>{% endfor %}</table></div>"""
 
 REVIEW_TEMPLATE = BASE_CSS + """<div class="container"><h1>Review: {{user_name}} - {{subject}}</h1><p>Score: {{score}}/10</p><a href="/admin_panel">← Back to Admin</a>{% for q in review_data %}<div class="question-box"><div class="question-title">Q{{q.num}}: {{q.prompt}}</div><p><b>Correct Answer:</b> <span class="correct">{{q.correct}}</span></p><p><b>Student Answer:</b> <span class="{{'correct' if q.is_correct else 'wrong'}}">{{q.student}}</span></p></div>{% endfor %}</div>"""
 
