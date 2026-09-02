@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.1 - DARK GOLD GLITTER UI FULL
+# SCHOLARS HAVEN V3.2.2 - DARK GOLD GLITTER UI + LOFI MUSIC
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -117,7 +117,7 @@ QUIZ_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1 style="color:#ffd700">🔐 Admin Login</h1>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center; border:1px solid #ffd700">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div></body>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.1</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI ACTIVE | PASSWORD LOGIN | 1 ATTEMPT TOTAL</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
+ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.2</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI + LOFI MUSIC ACTIVE</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
 
 SUBMIT_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px; color:#e5e5e5">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/" style="display:block; text-align:center; margin-top:20px; background:#ffd700; color:#000; padding:12px; border-radius:8px; font-weight:700">Back to Login</a></div></body>"""
 
@@ -161,7 +161,50 @@ def register():
 def home():
     if "user_id" not in session: return redirect("/")
     user_name = session['user_name'].title()
-    html = BASE_CSS + f"""<body class="home-body"><div class="container home-container"><h1>Welcome {user_name}</h1><p style="text-align:center; color:#ffd700; font-weight:600">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><form method="POST" action="/start_quiz"><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p></div></body>"""
+    html = BASE_CSS + f"""<body class="home-body">
+
+    <!-- LOFI BACKGROUND MUSIC -->
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_d1716ae218.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container home-container">
+        <h1>Welcome {user_name}</h1>
+        <p style="text-align:center; color:#ffd700; font-weight:600">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p>
+
+        <button id="musicBtn" onclick="toggleMusic()" style="width:auto; padding:10px 20px; font-size:14px; margin:0 auto 20px; display:block">🔊 Music: ON</button>
+
+        <form method="POST" action="/start_quiz">
+            <select name="subject" required>
+                <option value="" disabled selected>Select Subject</option>
+                {subject_options}
+            </select>
+            <button>Start Quiz</button>
+        </form>
+        <p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p>
+    </div>
+
+    <script>
+    const music = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    music.volume = 0.20;
+
+    window.addEventListener('load', () => {{
+        music.play().catch(()=>{{
+            btn.innerText = '🔇 Music: OFF - Click to Play';
+        }});
+    }});
+
+    function toggleMusic() {{
+        if(music.paused){{
+            music.play();
+            btn.innerText = '🔊 Music: ON';
+        }} else {{
+            music.pause();
+            btn.innerText = '🔇 Music: OFF';
+        }}
+    }}
+    </script></body>"""
     return render_template_string(html)
 
 @app.route("/start_quiz", methods=["POST"])
@@ -176,11 +219,6 @@ def start_quiz():
     user.subject = subject; user.start_time = time.time(); db.session.commit(); return redirect("/quiz")
 
 @app.route("/quiz", methods=["GET", "POST"])
-def quiz():
-    if "user_id" not in session: return redirect("/")
-    user = User.query.get(session["user_id"])
-    if time.time() - user.start_time > QUIZ_DURATION: return redirect("/submit")
-    time_left = int(QUIZ_DURATION - (time.time() - user.start_time))@app.route("/quiz", methods=["GET", "POST"])
 def quiz():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
