@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.7P - FULL DARK GOLD + RIPPLE RESTORED
+# SCHOLARS HAVEN V3.2.8 - FULL DARK GOLD + RIPPLE + ADMIN RESTORED
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -19,7 +19,7 @@ else:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app) # <-- ONLY KEEP THIS ONE
+db = SQLAlchemy(app)
 
 QUIZ_DURATION = 180
 ADMIN_PASSWORD = "ScholarsAdmin123"
@@ -57,8 +57,6 @@ class Attempt(db.Model):
     score = db.Column(db.Integer)
     submitted_at = db.Column(db.Float)
 
-# DELETED THE DUPLICATE CONFIG HERE ^
-
 def load_questions():
     db.create_all()
     if Question.query.count() == 0:
@@ -81,7 +79,10 @@ body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex;
 @keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}}
 h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 8px rgba({color_rgb},0.5); margin-bottom:10px;}}
 .user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px;}}
-input, select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
+.input-group {{position:relative; margin-top:12px;}}
+.input-group input {{width:100%; padding:14px 14px 14px 45px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
+.input-icon {{position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px;}}
+select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
 button:hover {{transform:translateY(-2px); box-shadow:0 6px 20px rgba({color_rgb},0.6);}}
 .timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}}
@@ -92,6 +93,8 @@ button:hover {{transform:translateY(-2px); box-shadow:0 6px 20px rgba({color_rgb
 .options input[type="radio"] {{accent-color: rgb({color_rgb}); width:20px; height:20px;}}
 .logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 15px rgba({color_rgb},0.8))}}
 @keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.7)}} 70%{{box-shadow:0 0 0 15px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
+.admin-link {{display:block; text-align:center; margin-top:20px; color:rgba({color_rgb},0.6); text-decoration:none; font-size:14px;}}
+.admin-link:hover {{color:rgb({color_rgb});}}
 </style>"""
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS])
@@ -100,7 +103,7 @@ def render_page(template, color_rgb="255,215,0", **kwargs):
     r,g,b = color_rgb.split(",")
     return render_template_string(get_base_css(r,g,b) + template, **kwargs)
 
-LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" class="logo"><h1>Scholars'Haven</h1><p style="text-align:center; color:rgba(255,215,0,0.8); margin-bottom:30px;">UTME CBT Portal</p>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center;">{{error}}</p>{% endif %}<form method="POST"><input name="name" placeholder="👤 Full Name" required><input type="password" name="password" placeholder="🔒 Password" required><button>Login →</button></form></div></body>"""
+LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" class="logo"><h1>Scholars'Haven</h1><p style="text-align:center; color:rgba(255,215,0,0.8); margin-bottom:30px;">UTME CBT Portal</p>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center;">{{error}}</p>{% endif %}<form method="POST"><div class="input-group"><span class="input-icon">👤</span><input name="name" placeholder="Full Name" required></div><div class="input-group"><span class="input-icon">🔒</span><input type="password" name="password" placeholder="Password" required></div><button>Login →</button></form><a href="/admin" class="admin-link">Admin Panel</a></div></body>"""
 
 HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><div class="user-greet">UTME CBT | 10 Questions | 3 Minutes</div><button id="musicBtn" onclick="toggleMusic()" style="width:auto; margin:0 auto 20px; display:block; animation:pulse 2s infinite">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
 
@@ -192,6 +195,19 @@ def submit():
         user.score = session.get("score", 0)
         db.session.commit()
     return render_page(SUBMIT_TEMPLATE, name=session["user_name"].title(), score=user.score, total_q=session.get("total_q", 10))
+
+@app.route("/admin", methods=["GET", "POST"])
+def admin():
+    if request.method == "POST":
+        if request.form["password"] == ADMIN_PASSWORD:
+            users = User.query.order_by(User.score.desc()).all()
+            html = get_base_css() + '<body><div class="container"><h1>Admin Dashboard</h1><table style="width:100%; border-collapse:collapse;"><tr style="background:rgba(255,215,0,0.1)"><th style="padding:10px; border:1px solid gold">Name</th><th style="padding:10px; border:1px solid gold">Subject</th><th style="padding:10px; border:1px solid gold">Score</th></tr>'
+            for u in users:
+                html += f"<tr><td style='padding:10px; border:1px solid #333'>{u.name}</td><td style='padding:10px; border:1px solid #333'>{u.subject or '-'}</td><td style='padding:10px; border:1px solid #333'>{u.score}</td></tr>"
+            html += "</table><br><a href='/'>Back</a></div></body>"
+            return html
+        else: return render_page('<body><div class="container"><h1>Wrong Password</h1><a href="/admin">Try Again</a></div></body>')
+    return render_page('<body><div class="container"><h1>Admin Login</h1><form method=POST><div class="input-group"><span class="input-icon">🔑</span><input type=password name=password placeholder="Admin Password"></div><button>Login</button></form></div></body>')
 
 if __name__ == "__main__":
     app.run(debug=True)
