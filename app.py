@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.3 - DARK GOLD GLITTER UI + LOFI MUSIC CLICK TO PLAY
+# SCHOLARS HAVEN V3.2.4 - DARK GOLD GLITTER UI + LOFI MUSIC FROM STATIC
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -97,7 +97,7 @@ QUIZ_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1 style="color:#ffd700">🔐 Admin Login</h1>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center; border:1px solid #ffd700">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div></body>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.3</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI + LOFI MUSIC ACTIVE</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
+ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.4</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI + LOFI MUSIC FROM STATIC</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
 
 SUBMIT_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px; color:#e5e5e5">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/" style="display:block; text-align:center; margin-top:20px; background:#ffd700; color:#000; padding:12px; border-radius:8px; font-weight:700">Back to Login</a></div></body>"""
 
@@ -143,9 +143,9 @@ def home():
     user_name = session['user_name'].title()
     html = BASE_CSS + f"""<body class="home-body">
 
-    <!-- LOFI BACKGROUND MUSIC -->
-    <audio id="bgMusic" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_d1716ae218.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    <!-- LOFI BACKGROUND MUSIC FROM STATIC FOLDER -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="{{{{ url_for('static', filename='lofi.mp3') }}}}" type="audio/mpeg">
     </audio>
 
     <div class="container home-container">
@@ -176,7 +176,8 @@ def home():
                 btn.innerText = '🔊 Music: ON';
                 musicStarted = true;
             }}).catch(err=>{{
-                alert('Please click again to start music');
+                alert('Music failed: ' + err.message + '\\nMake sure lofi.mp3 is in static folder');
+                console.log(err);
             }});
         }} else {{
             if(music.paused){{
