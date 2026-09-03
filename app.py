@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.3.2 - 1 ATTEMPT TOTAL + ANIMATED GOLD RIPPLE FIXED
+# SCHOLARS HAVEN V3.4.0 - SKIP + SUBMIT + TIMER TOP RIGHT
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -36,7 +36,7 @@ class User(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(20), nullable=False)
     subject = db.Column(db.String(100))
-    has_attempted = db.Column(db.Boolean, default=False) # <-- 1 ATTEMPT TOTAL FLAG
+    has_attempted = db.Column(db.Boolean, default=False)
     score = db.Column(db.Integer, default=0)
     start_time = db.Column(db.Float, default=0)
     submitted_at = db.Column(db.Float, default=0)
@@ -69,6 +69,7 @@ body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex;
 .container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 2px solid rgba({color_rgb},0.3); position:relative; overflow: hidden; box-shadow: 0 0 50px rgba({color_rgb},0.2);}}
 .container::after {{content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; background: conic-gradient(from 0deg, transparent 0%, rgba({color_rgb},0.9) 25%, transparent 50%, rgba({color_rgb},0.5) 75%, transparent 100%); animation: borderRipple 3s linear infinite; z-index: 1; pointer-events: none;}}
 @keyframes borderRipple {{0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }}}}
+.timer-fixed {{position: fixed; top: 20px; right: 20px; background:#ff4757; color:white; padding:12px 20px; border-radius:12px; text-align:center; font-weight:700; font-size:18px; z-index:9999; box-shadow:0 0 20px rgba(255,71,87,0.8);}}
 h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 20px rgba({color_rgb},0.8); margin-bottom:10px; position:relative; z-index:2;}}
 .user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px; position:relative; z-index:2;}}
 .input-group {{position:relative; margin-top:12px; z-index:2;}}
@@ -78,6 +79,8 @@ form, select, button, table, p {{position:relative; z-index:2;}}
 select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
 button:hover {{transform:translateY(-3px); box-shadow:0 10px 30px rgba({color_rgb},0.8);}}
+.btn-skip {{background:linear-gradient(135deg, #57606f, #2f3542); color:white;}}
+.btn-submit {{background:linear-gradient(135deg, #2ed573, #1e90ff); color:white;}}
 .btn-red {{background:linear-gradient(135deg, #ff4757, #ff2e43); color:white;}}
 .btn-green {{background:linear-gradient(135deg, #2ed573, #1e90ff); color:white;}}
 .timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}}
@@ -90,6 +93,8 @@ th {{background:rgba({color_rgb},0.1); color:rgb({color_rgb});}}
 .actions {{display:flex; gap:8px;}}
 .actions button {{padding:8px 12px; font-size:14px; margin:0; width:auto;}}
 .warning {{background:rgba(255,71,87,0.2); color:#ff4757; padding:15px; border-radius:10px; text-align:center; border:1px solid #ff4757;}}
+.btn-group {{display:flex; gap:10px;}}
+.btn-group button {{width:50%;}}
 </style>"""
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS])
@@ -102,7 +107,30 @@ LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', 
 
 HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><div class="user-greet">UTME CBT | 10 Questions | 3 Minutes | 1 Attempt Only</div><button id="musicBtn" onclick="toggleMusic()" style="width:auto; margin:0 auto 20px; display:block; animation:pulse 2s infinite">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
 
-QUIZ_TEMPLATE = """<body><div class="container"><h1>{{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div style="font-size:20px; font-weight:600; color:rgb({{color_rgb}}); margin-bottom:15px;">Question {{q_num}} of {{total_q}}</div><div>{{question.prompt}}</div></div><div>{% for opt in question.options.split('\\n') %}<label style="display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; cursor:pointer;"><input type="radio" name="answer" value="{{opt[0]}}" required style="accent-color: rgb({{color_rgb}}); width:20px; height:20px;"><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)document.querySelector('form').submit()},1000)</script></div></body>"""
+QUIZ_TEMPLATE = """<body>
+<div class="timer-fixed">⏱ <span id="timer">{{time_left}}</span>s</div>
+<div class="container">
+<h1>{{subject}}</h1>
+<div class="user-greet">Hi {{user_name}} 👋</div>
+<form method="POST">
+<div class="question-box">
+<div style="font-size:20px; font-weight:600; color:rgb({{color_rgb}}); margin-bottom:15px;">Question {{q_num}} of {{total_q}}</div>
+<div>{{question.prompt}}</div>
+</div>
+<div>{% for opt in question.options.split('\\n') %}<label style="display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; cursor:pointer;"><input type="radio" name="answer" value="{{opt[0]}}" style="accent-color: rgb({{color_rgb}}); width:20px; height:20px;"><span>{{opt}}</span></label>{% endfor %}</div>
+
+<div class="btn-group">
+<button type="submit" name="action" value="skip" class="btn-skip">⏭️ Skip</button>
+{% if is_last %}
+<button type="submit" name="action" value="submit" class="btn-submit">✅ Submit Quiz</button>
+{% else %}
+<button type="submit" name="action" value="next">Next Question →</button>
+{% endif %}
+</div>
+
+</form>
+<script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)window.location.href='/submit'},1000)</script>
+</div></body>"""
 
 SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Score: {{score}}/{{total_q}} in {{subject}}</p><p style="text-align:center; color:rgba(255,71,87,0.8)">You cannot attempt again</p></div></body>"""
 
@@ -171,17 +199,27 @@ def quiz():
 
     if q_index >= total_q: return redirect("/submit")
 
+    is_last = (q_index == total_q - 1)
+
     if request.method == "POST":
-        ans = request.form["answer"].lower().strip()
-        session["answers"][str(q_index+1)] = ans
-        if ans == questions[q_index].answer: session["score"] += 1
+        action = request.form.get("action")
+        ans = request.form.get("answer")
+
+        if ans: # Only save if they selected an option
+            session["answers"][str(q_index+1)] = ans.lower().strip()
+            if ans.lower().strip() == questions[q_index].answer:
+                session["score"] += 1
+
+        if action == "submit" or is_last:
+            return redirect("/submit")
+
         session["q_index"] += 1
         session.modified = True
         color_rgb = request.args.get('color', '255,215,0')
         return redirect(f"/quiz?color={color_rgb}")
 
     color_rgb = request.args.get('color', '255,215,0')
-    return render_page(QUIZ_TEMPLATE, color_rgb=color_rgb, subject=session["subject"], question=questions[q_index], q_num=q_index+1, total_q=total_q, time_left=time_left, user_name=session["user_name"].title())
+    return render_page(QUIZ_TEMPLATE, color_rgb=color_rgb, subject=session["subject"], question=questions[q_index], q_num=q_index+1, total_q=total_q, time_left=time_left, user_name=session["user_name"].title(), is_last=is_last)
 
 @app.route("/submit")
 def submit():
