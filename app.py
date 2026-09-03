@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.4.0 - SKIP + SUBMIT + TIMER TOP RIGHT
+# SCHOLARS HAVEN V3.4.1 - SKIP + SUBMIT + TIMER TOP RIGHT + GENTLE GOLD GLOW
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -66,33 +66,33 @@ def get_base_css(r="255",g="215",b="0"):
     return f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0a0a0a; color:#e5e5e5;}}
-.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 2px solid rgba({color_rgb},0.3); position:relative; overflow: hidden; box-shadow: 0 0 50px rgba({color_rgb},0.2);}}
-.container::after {{content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; background: conic-gradient(from 0deg, transparent 0%, rgba({color_rgb},0.9) 25%, transparent 50%, rgba({color_rgb},0.5) 75%, transparent 100%); animation: borderRipple 3s linear infinite; z-index: 1; pointer-events: none;}}
-@keyframes borderRipple {{0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }}}}
-.timer-fixed {{position: fixed; top: 20px; right: 20px; background:#ff4757; color:white; padding:12px 20px; border-radius:12px; text-align:center; font-weight:700; font-size:18px; z-index:9999; box-shadow:0 0 20px rgba(255,71,87,0.8);}}
-h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 20px rgba({color_rgb},0.8); margin-bottom:10px; position:relative; z-index:2;}}
-.user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px; position:relative; z-index:2;}}
+.container {{background:linear-gradient(145deg, #161616, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 1px solid rgba({color_rgb},0.25); position:relative; overflow: hidden; box-shadow: 0 0 30px rgba({color_rgb},0.12), inset 0 0 0 1px rgba({color_rgb},0.1); animation: gentleGlow 4s ease-in-out infinite;}}
+@keyframes gentleGlow {{0%, 100% {{box-shadow: 0 0 30px rgba({color_rgb},0.12), inset 0 0 0 1px rgba({color_rgb},0.1);}} 50% {{box-shadow: 0 0 45px rgba({color_rgb},0.2), inset 0 0 0 1px rgba({color_rgb},0.15);}}}}
+.timer-fixed {{position: fixed; top: 20px; right: 20px; background:linear-gradient(135deg, #ff4757, #e84118); color:white; padding:12px 20px; border-radius:12px; text-align:center; font-weight:700; font-size:18px; z-index:9999; box-shadow:0 4px 15px rgba(255,71,87,0.4); backdrop-filter: blur(10px);}}
+h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 15px rgba({color_rgb},0.4); margin-bottom:10px; position:relative; z-index:2; font-weight:700;}}
+.user-greet {{text-align:center; color:rgba({color_rgb},0.85); font-weight:600; margin-bottom:20px; font-size:18px; position:relative; z-index:2;}}
 .input-group {{position:relative; margin-top:12px; z-index:2;}}
-.input-group input {{width:100%; padding:14px 14px 14px 45px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
-.input-icon {{position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px;}}
+.input-group input {{width:100%; padding:14px 14px 14px 45px; border-radius:10px; border:1px solid rgba({color_rgb},0.3); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box; transition:0.3s;}}
+.input-group input:focus {{outline:none; border-color:rgb({color_rgb}); box-shadow:0 0 15px rgba({color_rgb},0.2);}}
+.input-icon {{position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px; opacity:0.7;}}
 form, select, button, table, p {{position:relative; z-index:2;}}
-select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
-button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
-button:hover {{transform:translateY(-3px); box-shadow:0 10px 30px rgba({color_rgb},0.8);}}
-.btn-skip {{background:linear-gradient(135deg, #57606f, #2f3542); color:white;}}
+select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgba({color_rgb},0.3); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box; transition:0.3s;}}
+button {{background:linear-gradient(135deg, rgba({color_rgb},0.9), #ffb700); color:#000; font-weight:700; cursor:pointer;}}
+button:hover {{transform:translateY(-2px); box-shadow:0 8px 20px rgba({color_rgb},0.3);}}
+.btn-skip {{background:linear-gradient(135deg, #3d3d3d, #2a2a2a); color:rgba({color_rgb},0.9); border:1px solid rgba({color_rgb},0.2);}}
+.btn-skip:hover {{background:linear-gradient(135deg, #4d4d4d, #3a3a3a);}}
 .btn-submit {{background:linear-gradient(135deg, #2ed573, #1e90ff); color:white;}}
 .btn-red {{background:linear-gradient(135deg, #ff4757, #ff2e43); color:white;}}
 .btn-green {{background:linear-gradient(135deg, #2ed573, #1e90ff); color:white;}}
-.timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}}
-.question-box {{background:#222; padding:20px; border-radius:12px; border-left:5px solid rgb({color_rgb}); margin-bottom:20px;}}
-.logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 25px rgba({color_rgb},1))}}
-@keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.8)}} 70%{{box-shadow:0 0 0 25px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
+.question-box {{background:rgba(30,30,30,0.6); padding:20px; border-radius:12px; border-left:4px solid rgb({color_rgb}); margin-bottom:20px; backdrop-filter: blur(10px);}}
+.logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 15px rgba({color_rgb},0.5))}}
+@keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.4)}} 70%{{box-shadow:0 0 0 20px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
 table {{width:100%; border-collapse:collapse; margin-top:20px;}}
-th, td {{padding:12px; border:1px solid #333; text-align:left;}}
-th {{background:rgba({color_rgb},0.1); color:rgb({color_rgb});}}
+th, td {{padding:12px; border:1px solid rgba(255,255,255,0.1); text-align:left;}}
+th {{background:rgba({color_rgb},0.08); color:rgb({color_rgb}); font-weight:600;}}
 .actions {{display:flex; gap:8px;}}
 .actions button {{padding:8px 12px; font-size:14px; margin:0; width:auto;}}
-.warning {{background:rgba(255,71,87,0.2); color:#ff4757; padding:15px; border-radius:10px; text-align:center; border:1px solid #ff4757;}}
+.warning {{background:rgba(255,71,87,0.15); color:#ff4757; padding:15px; border-radius:10px; text-align:center; border:1px solid rgba(255,71,87,0.3);}}
 .btn-group {{display:flex; gap:10px;}}
 .btn-group button {{width:50%;}}
 </style>"""
@@ -117,7 +117,7 @@ QUIZ_TEMPLATE = """<body>
 <div style="font-size:20px; font-weight:600; color:rgb({{color_rgb}}); margin-bottom:15px;">Question {{q_num}} of {{total_q}}</div>
 <div>{{question.prompt}}</div>
 </div>
-<div>{% for opt in question.options.split('\\n') %}<label style="display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; cursor:pointer;"><input type="radio" name="answer" value="{{opt[0]}}" style="accent-color: rgb({{color_rgb}}); width:20px; height:20px;"><span>{{opt}}</span></label>{% endfor %}</div>
+<div>{% for opt in question.options.split('\\n') %}<label style="display:flex; align-items:center; gap:12px; background:rgba(26,26,26,0.7); padding:14px; margin:10px 0; border-radius:10px; border:1px solid rgba({{color_rgb}},0.2); cursor:pointer; transition:0.2s;"><input type="radio" name="answer" value="{{opt[0]}}" style="accent-color: rgb({{color_rgb}}); width:20px; height:20px;"><span>{{opt}}</span></label>{% endfor %}</div>
 
 <div class="btn-group">
 <button type="submit" name="action" value="skip" class="btn-skip">⏭️ Skip</button>
