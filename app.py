@@ -1,5 +1,5 @@
-# SCHOLARS HAVEN V3.2.7N - CSS + RIPPLE + 90 QUESTIONS
-from flask import Flask, render_template_string, request, redirect, session, url_for, jsonify
+# SCHOLARS HAVEN V3.2.7O - FULL DARK GOLD + RIPPLE RESTORED
+from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 import time
 import json
@@ -82,7 +82,26 @@ def generate_password():
 
 def get_base_css(r="255",g="215",b="0"):
     color_rgb = f"{r},{g},{b}"
-    return f"""<style> @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); body {{font-family: 'Poppins', sans-serif; margin:0; padding:0; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0a0a0a;}}.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; box-shadow:0 0 20px rgba({color_rgb},0.15); width:90%; max-width:800px; border:1px solid rgba({color_rgb},0.2); position:relative; overflow:hidden;}}.container::before {{content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; border-radius: 25px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.05) 30%, rgba({color_rgb},0.6) 50%, rgba({color_rgb},0.05) 70%, transparent 100%); background-size: 300% 100%; animation: borderRipple 8s linear infinite; z-index: -1; filter: blur(2px); opacity: 0.5;}} @keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}} h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 8px rgba({color_rgb},0.5);}} input, select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px;}} button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer;}} button:hover {{transform:translateY(-2px);}}.timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700;}}.options label {{display:block; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; color:rgb({color_rgb}); cursor:pointer;}}.options label:hover {{border-color:rgb({color_rgb});}} </style>"""
+    return f"""<style> 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); 
+body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0a0a0a; color:#e5e5e5;}}
+.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:800px; border: 1px solid rgba({color_rgb},0.2); position:relative; overflow: hidden;}}
+.container::before {{content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; border-radius: 25px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.05) 30%, rgba({color_rgb},0.6) 50%, rgba({color_rgb},0.05) 70%, transparent 100%); background-size: 300% 100%; animation: borderRipple 8s linear infinite; z-index: -1; filter: blur(2px); opacity: 0.5;}}
+@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}}
+h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 8px rgba({color_rgb},0.5); margin-bottom:10px;}}
+.user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px;}}
+input, select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
+button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
+button:hover {{transform:translateY(-2px); box-shadow:0 6px 20px rgba({color_rgb},0.6);}}
+.timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}}
+.question-box {{background:#222; padding:20px; border-radius:12px; border-left:5px solid rgb({color_rgb}); margin-bottom:20px;}}
+.question-title {{font-size:20px; font-weight:600; color:rgb({color_rgb}); margin-bottom:15px;}}
+.options label {{display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; color:#e5e5e5; cursor:pointer; transition:0.2s;}}
+.options label:hover {{border-color:rgb({color_rgb}); background:#222;}}
+.options input[type="radio"] {{accent-color: rgb({color_rgb}); width:20px; height:20px;}}
+.logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 15px rgba({color_rgb},0.8))}}
+@keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.7)}} 70%{{box-shadow:0 0 0 15px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
+</style>"""
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS])
 
@@ -90,15 +109,13 @@ def render_page(template, color_rgb="255,215,0", **kwargs):
     r,g,b = color_rgb.split(",")
     return render_template_string(get_base_css(r,g,b) + template, **kwargs)
 
-LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" style="width:100px; display:block; margin:0 auto"><h1>Scholars'Haven</h1>{% if error %}<p style="color:red">{{error}}</p>{% endif %}<form method="POST"><input name="name" placeholder="👤 Full Name" required><input type="password" name="password" placeholder="🔒 Password" required><button>Login →</button></form><p style="text-align:center"><a href="/register">New Student?</a></p></div></body>"""
+LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" class="logo"><h1>Scholars'Haven</h1><p style="text-align:center; color:rgba(255,215,0,0.8); margin-bottom:30px;">UTME CBT Portal</p>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center;">{{error}}</p>{% endif %}<form method="POST"><input name="name" placeholder="👤 Full Name" required><input type="password" name="password" placeholder="🔒 Password" required><button>Login →</button></form></div></body>"""
 
-REGISTER_TEMPLATE = """<body><div class="container"><h1>📝 Create Account</h1><form method="POST"><input name="name" placeholder="Enter your full name" required><button>Generate Password</button></form>{% if password %}<p>Your Password: <b>{{password}}</b> - Save it!</p>{% endif %}{% if error %}<p style="color:red">{{error}}</p>{% endif %}</div></body>"""
+HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><div class="user-greet">UTME CBT | 10 Questions | 3 Minutes</div><button id="musicBtn" onclick="toggleMusic()" style="width:auto; margin:0 auto 20px; display:block; animation:pulse 2s infinite">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
 
-HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><button id="musicBtn" onclick="toggleMusic()">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
+QUIZ_TEMPLATE = """<body><div class="container"><h1>{{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of {{total_q}}</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)document.querySelector('form').submit()},1000)</script></div></body>"""
 
-QUIZ_TEMPLATE = """<body><div class="container"><h1>{{subject}}</h1><p>Hi {{user_name}}</p><div class="timer">Time Left: <span id="timer">{{time_left}}</span>s</div><form method="POST"><p><b>Question {{q_num}} of {{total_q}}</b></p><p>{{question.prompt}}</p><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required>{{opt}}</label>{% endfor %}</div><button>Next Question →</button></form><script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)document.querySelector('form').submit()},1000)</script></div></body>"""
-
-SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p>Thank you {{name}}!<br>Score: {{score}}/{{total_q}}</p></div></body>"""
+SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Score: {{score}}/{{total_q}}</p></div></body>"""
 
 @app.route("/init")
 def init_db():
@@ -115,23 +132,10 @@ def login():
         password = request.form["password"]
         user = User.query.filter_by(name=name, password=password).first()
         if user:
-            session["user_id"] = user.id; session["user_name"] = user.name; session["music_on"] = user.music_on
+            session["user_id"] = user.id; session["user_name"] = user.name
             return redirect("/home")
         else: return render_page(LOGIN_TEMPLATE, error="Invalid Name or Password")
     return render_page(LOGIN_TEMPLATE, error=None)
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    password = None; error = None
-    if request.method == "POST":
-        name = request.form["name"].lower().strip()
-        if User.query.filter_by(name=name).first():
-            error = "Name already taken."
-        else:
-            password = generate_password()
-            new_user = User(name=name, password=password)
-            db.session.add(new_user); db.session.commit()
-    return render_page(REGISTER_TEMPLATE, password=password, error=error)
 
 @app.route("/home")
 def home():
@@ -197,11 +201,6 @@ def submit():
         user.score = session.get("score", 0)
         db.session.commit()
     return render_page(SUBMIT_TEMPLATE, name=session["user_name"].title(), score=user.score, total_q=session.get("total_q", 10))
-
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
 
 if __name__ == "__main__":
     app.run(debug=True)
