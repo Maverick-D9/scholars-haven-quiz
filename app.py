@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.7O - FULL DARK GOLD + RIPPLE RESTORED
+# SCHOLARS HAVEN V3.2.7P - FULL DARK GOLD + RIPPLE RESTORED
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -19,7 +19,7 @@ else:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db = SQLAlchemy(app) # <-- ONLY KEEP THIS ONE
 
 QUIZ_DURATION = 180
 ADMIN_PASSWORD = "ScholarsAdmin123"
@@ -57,9 +57,7 @@ class Attempt(db.Model):
     score = db.Column(db.Integer)
     submitted_at = db.Column(db.Float)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+# DELETED THE DUPLICATE CONFIG HERE ^
 
 def load_questions():
     db.create_all()
