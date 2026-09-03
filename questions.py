@@ -1,0 +1,110 @@
+ALL_QUESTIONS = {
+    "Mathematics": [
+        ("Share N2400 in the ratio 3:5", "A. N900, N1500\nB. N1000, N1400\nC. N800, N1600\nD. N1200, N1200", "a"),
+        ("What is 25% of N800?", "A. N100\nB. N200\nC. N250\nD. N300", "b"),
+        ("If 5 men can do a job in 8 days, how long will 8 men take?", "A. 3 days\nB. 4 days\nC. 5 days\nD. 6 days", "c"),
+        ("Increase N400 by 15%", "A. N440\nB. N450\nC. N460\nD. N480", "c"),
+        ("The ratio of boys to girls is 4:3. If there are 28 boys, how many girls?", "A. 18\nB. 20\nC. 21\nD. 24", "c"),
+        ("A trader buys goods for N500 and sells for N650. What is the % profit?", "A. 20%\nB. 25%\nC. 30%\nD. 35%", "c"),
+        ("Divide 90 in the ratio 2:3:4", "A. 20,30,40\nB. 18,27,45\nC. 15,25,50\nD. 10,30,50", "a"),
+        ("Decrease N1200 by 20%", "A. N960\nB. N1000\nC. N1020\nD. N1080", "a"),
+        ("If 6 workers earn N54000 in 3 days, how much will 4 workers earn in 5 days?", "A. N54000\nB. N60000\nC. N72000\nD. N90000", "b"),
+        ("The proportion 4:5 = x:20. Find x", "A. 12\nB. 14\nC. 16\nD. 18", "c")
+    ],
+    "English": [
+        ("She ___ finished her assignment before I arrived", "A. has\nB. have\nC. had\nD. having", "c"),
+        ("The students ___ submitted their forms", "A. has\nB. have\nC. had\nD. having", "b"),
+        ("He ___ been to London twice", "A. has\nB. have\nC. had\nD. having", "a"),
+        ("I ___ never seen such a beautiful sight", "A. has\nB. have\nC. had\nD. having", "b"),
+        ("They ___ left when we got there", "A. has\nB. have\nC. had\nD. having", "c"),
+        ("My father ___ worked here for 10 years", "A. has\nB. have\nC. had\nD. having", "a"),
+        ("___ you ever eaten suya?", "A. Has\nB. Have\nC. Had\nD. Having", "b"),
+        ("She said she ___ completed the task", "A. has\nB. have\nC. had\nD. having", "c"),
+        ("The baby ___ cried all night", "A. has\nB. have\nC. had\nD. having", "c"),
+        ("We ___ not received any letter from him", "A. has\nB. have\nC. had\nD. having", "b")
+    ],
+    "Physics": [
+        ("Which of the following is a scalar quantity?", "A. Force\nB. Velocity\nC. Speed\nD. Acceleration", "c"),
+        ("The dimension of force is", "A. MLT^-1\nB. MLT^-2\nC. ML^2T^-2\nD. ML^-1T^-2", "b"),
+        ("Which is a vector quantity?", "A. Mass\nB. Time\nC. Displacement\nD. Energy", "c"),
+        ("Dimension of work is", "A. MLT^-1\nB. MLT^-2\nC. ML^2T^-2\nD. ML^-1T^-2", "c"),
+        ("Speed is to velocity as distance is to", "A. Mass\nB. Force\nC. Displacement\nD. Acceleration", "c"),
+        ("The S.I unit of power is", "A. Joule\nB. Watt\nC. Newton\nD. Pascal", "b"),
+        ("Which pair are both vectors?", "A. Mass and weight\nB. Force and energy\nC. Velocity and momentum\nD. Time and temperature", "c"),
+        ("Dimension of pressure is", "A. ML^-1T^-2\nB. MLT^-2\nC. ML^2T^-2\nD. M^-1LT^-2", "a"),
+        ("Which is not a fundamental quantity?", "A. Length\nB. Mass\nC. Area\nD. Time", "c"),
+        ("The dimension of density is", "A. ML^-3\nB. ML^-2\nC. ML^-1\nD. M^2L^-3", "a")
+    ],
+    "Chemistry": [
+        ("At constant temperature, P1V1 = P2V2 is", "A. Charles Law\nB. Boyle's Law\nC. Gay-Lussac Law\nD. Dalton Law", "b"),
+        ("V1/T1 = V2/T2 at constant pressure is", "A. Boyle's Law\nB. Charles Law\nC. Gay-Lussac Law\nD. Avogadro Law", "b"),
+        ("P1/T1 = P2/T2 at constant volume is", "A. Boyle's Law\nB. Charles Law\nC. Gay-Lussac Law\nD. Graham Law", "c"),
+        ("A gas occupies 200cm3 at 2atm. What volume at 4atm?", "A. 50cm3\nB. 100cm3\nC. 400cm3\nD. 800cm3", "b"),
+        ("A gas at 27°C occupies 500cm3. What volume at 127°C?", "A. 250cm3\nB. 500cm3\nC. 666.7cm3\nD. 1000cm3", "c"),
+        ("Rate of diffusion is inversely proportional to sqrt of density is", "A. Boyle's Law\nB. Charles Law\nC. Graham's Law\nD. Dalton Law", "c"),
+        ("A gas exerts 760mmHg at 273K. Pressure at 546K?", "A. 380mmHg\nB. 760mmHg\nC. 1140mmHg\nD. 1520mmHg", "d"),
+        ("Which gas law explains pressure cookers?", "A. Boyle's Law\nB. Charles Law\nC. Gay-Lussac Law\nD. Avogadro Law", "c"),
+        ("2L of gas at 1atm. Pressure needed to reduce to 0.5L?", "A. 0.25atm\nB. 0.5atm\nC. 2atm\nD. 4atm", "d"),
+        ("Total pressure of gas mixture = sum of partial pressures is", "A. Boyle's Law\nB. Charles Law\nC. Dalton's Law\nD. Gay-Lussac Law", "c")
+    ],
+    "Biology": [
+        ("Which cell organelle is the powerhouse of the cell?", "A. Nucleus\nB. Mitochondria\nC. Ribosome\nD. Chloroplast", "b"),
+        ("DNA is found in the", "A. Cytoplasm\nB. Nucleus\nC. Cell wall\nD. Vacuole", "b"),
+        ("Which is not found in plant cell?", "A. Cell wall\nB. Centriole\nC. Chloroplast\nD. Large vacuole", "b"),
+        ("The basic unit of life is", "A. Tissue\nB. Organ\nC. Cell\nD. Organelle", "c"),
+        ("Function of ribosome", "A. Respiration\nB. Protein synthesis\nC. Digestion\nD. Storage", "b"),
+        ("Green pigment in plants is", "A. Carotene\nB. Chlorophyll\nC. Anthocyanin\nD. Xanthophyll", "b"),
+        ("Which blood cell has no nucleus?", "A. Lymphocyte\nB. Red blood cell\nC. Monocyte\nD. Neutrophil", "b"),
+        ("Cell membrane is made of", "A. Cellulose\nB. Lipid and protein\nC. Chitin\nD. Starch", "b"),
+        ("Organelle for digestion in cell", "A. Lysosome\nB. Peroxisome\nC. Vacuole\nD. Plastid", "a"),
+        ("Plant cells are rigid due to", "A. Cell membrane\nB. Cell wall\nC. Cytoplasm\nD. Nucleus", "b")
+    ],
+    "Government": [
+        ("The supreme power of a state is called", "A. Authority\nB. Sovereignty\nC. Legitimacy\nD. Government", "b"),
+        ("How many arms of government do we have?", "A. 2\nB. 3\nC. 4\nD. 5", "b"),
+        ("A system where people elect representatives is", "A. Direct democracy\nB. Indirect democracy\nC. Monarchy\nD. Oligarchy", "b"),
+        ("Fundamental human rights are in Chapter ___ of 1999 constitution", "A. II\nB. III\nC. IV\nD. V", "c"),
+        ("The first military coup in Nigeria was in", "A. 1960\nB. 1963\nC. 1966\nD. 1975", "c"),
+        ("Pressure groups aim to", "A. Win elections\nB. Influence government\nC. Make laws\nD. Judge cases", "b"),
+        ("Citizenship by birth is called", "A. Naturalization\nB. Registration\nC. Jus soli\nD. Honorary", "c"),
+        ("The 1999 constitution practices ___ system", "A. Parliamentary\nB. Presidential\nC. Monarchical\nD. Military", "b"),
+        ("Rule of law means", "A. Rule by the rich\nB. Supremacy of law\nC. Rule by military\nD. Rule by tradition", "b"),
+        ("The upper house in Nigeria is called", "A. House of Reps\nB. Senate\nC. National Assembly\nD. Federal Assembly", "b")
+    ],
+    "Economics": [
+        ("The central problem of economics is", "A. Inflation\nB. Scarcity\nC. Unemployment\nD. Poverty", "b"),
+        ("Opportunity cost is", "A. Total cost\nB. Next best alternative forgone\nC. Money cost\nD. Fixed cost", "b"),
+        ("Land is rewarded with", "A. Wages\nB. Interest\nC. Rent\nD. Profit", "c"),
+        ("Capital is rewarded with", "A. Wages\nB. Interest\nC. Rent\nD. Profit", "b"),
+        ("Labour is rewarded with", "A. Wages\nB. Interest\nC. Rent\nD. Profit", "a"),
+        ("Entrepreneurship is rewarded with", "A. Wages\nB. Interest\nC. Rent\nD. Profit", "d"),
+        ("Goods used for further production are", "A. Consumer goods\nB. Capital goods\nC. Free goods\nD. Inferior goods", "b"),
+        ("The study of individual units is", "A. Macroeconomics\nB. Microeconomics\nC. Econometrics\nD. Statistics", "b"),
+        ("What you give up to get something else", "A. Price\nB. Cost\nC. Opportunity cost\nD. Budget", "c"),
+        ("Utility means", "A. Price\nB. Satisfaction\nC. Cost\nD. Demand", "b")
+    ],
+    "Literature": [
+        ("A story with animals acting like humans to teach a moral", "A. Epic\nB. Ballad\nC. Fable\nD. Ode", "c"),
+        ("A long narrative poem about a hero", "A. Sonnet\nB. Epic\nC. Elegy\nD. Lyric", "b"),
+        ("A song of mourning for the dead", "A. Sonnet\nB. Dirge\nC. Ode\nD. Ballad", "b"),
+        ("Proverbs are examples of", "A. Drama\nB. Poetry\nC. Oral literature\nD. Novel", "c"),
+        ("A story to explain natural phenomena", "A. Myth\nB. Legend\nC. Fable\nD. Ballad", "a"),
+        ("Chants used in worship are called", "A. Ballads\nB. Incantations\nC. Epics\nD. Tales", "b"),
+        ("Praise song for a king", "A. Dirge\nB. Panegyric\nC. Elegy\nD. Ballad", "b"),
+        ("Riddles test one's", "A. Strength\nB. Wisdom\nC. Beauty\nD. Speed", "b"),
+        ("A 14-line poem is called", "A. Epic\nB. Ballad\nC. Sonnet\nD. Ode", "c"),
+        ("Drama performed without audience is", "A. Tragedy\nB. Comedy\nC. Mime\nD. Satire", "c")
+    ],
+    "CRS": [
+        ("Who created man in His image?", "A. Angel\nB. God\nC. Adam\nD. Moses", "b"),
+        ("The first man and woman were", "A. Cain and Abel\nB. Abraham and Sarah\nC. Adam and Eve\nD. Isaac and Rebecca", "c"),
+        ("The garden where Adam and Eve lived", "A. Gethsemane\nB. Eden\nC. Sinai\nD. Zion", "b"),
+        ("Who tempted Eve in the garden?", "A. Cain\nB. Serpent\nC. Angel\nD. God", "b"),
+        ("The consequence of Adam's sin was", "A. Blessing\nB. Death\nC. Wealth\nD. Joy", "b"),
+        ("God provided clothes made of ___ for Adam and Eve", "A. Cotton\nB. Linen\nC. Animal skin\nD. Leaves", "c"),
+        ("Who was the first child of Adam and Eve?", "A. Seth\nB. Cain\nC. Abel\nD. Noah", "b"),
+        ("God rested on the ___ day", "A. 6th\nB. 7th\nC. 1st\nD. 3rd", "b"),
+        ("Noah built an ___ to escape the flood", "A. House\nB. Ark\nC. Boat\nD. Tower", "b"),
+        ("Abraham is called the father of", "A. Prophets\nB. Nations\nC. Faith\nD. Kings", "c")
+    ]
+}
