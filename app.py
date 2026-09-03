@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.3.1 - 1 ATTEMPT TOTAL + FULL DARK GOLD RIPPLE
+# SCHOLARS HAVEN V3.3.2 - 1 ATTEMPT TOTAL + ANIMATED GOLD RIPPLE FIXED
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -63,17 +63,18 @@ def generate_password():
 
 def get_base_css(r="255",g="215",b="0"):
     color_rgb = f"{r},{g},{b}"
-    return f"""<style> 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); 
+    return f"""<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0a0a0a; color:#e5e5e5;}}
-.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 1px solid rgba({color_rgb},0.2); position:relative; overflow: hidden; box-shadow: 0 0 40px rgba({color_rgb},0.15);}}
-.container::before {{content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.1) 20%, rgba({color_rgb},1) 50%, rgba({color_rgb},0.1) 80%, transparent 100%); background-size: 400% 100%; animation: borderRipple 5s linear infinite; z-index: -1; filter: blur(4px);}}
-@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 400% 50%; }}}}
-h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 20px rgba({color_rgb},0.8); margin-bottom:10px;}}
-.user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px;}}
-.input-group {{position:relative; margin-top:12px;}}
+.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 2px solid rgba({color_rgb},0.3); position:relative; overflow: hidden; box-shadow: 0 0 50px rgba({color_rgb},0.2);}}
+.container::after {{content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; background: conic-gradient(from 0deg, transparent 0%, rgba({color_rgb},0.9) 25%, transparent 50%, rgba({color_rgb},0.5) 75%, transparent 100%); animation: borderRipple 3s linear infinite; z-index: 1; pointer-events: none;}}
+@keyframes borderRipple {{0% {{ transform: rotate(0deg); }} 100% {{ transform: rotate(360deg); }}}}
+h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 20px rgba({color_rgb},0.8); margin-bottom:10px; position:relative; z-index:2;}}
+.user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px; position:relative; z-index:2;}}
+.input-group {{position:relative; margin-top:12px; z-index:2;}}
 .input-group input {{width:100%; padding:14px 14px 14px 45px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 .input-icon {{position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px;}}
+form, select, button, table, p {{position:relative; z-index:2;}}
 select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
 button:hover {{transform:translateY(-3px); box-shadow:0 10px 30px rgba({color_rgb},0.8);}}
@@ -139,7 +140,7 @@ def start_quiz():
     if "user_id" not in session: return redirect("/")
     user = User.query.get(session["user_id"])
     if user.has_attempted: return "Already Attempted"
-    
+
     subject = request.form["subject"]
     session["subject"] = subject
     subject_questions = Question.query.filter_by(subject=subject).all()
@@ -158,18 +159,18 @@ def start_quiz():
 def quiz():
     if "user_id" not in session: return redirect("/")
     if "shuffled_ids" not in session: return redirect("/home")
-    
+
     user = User.query.get(session["user_id"])
     if time.time() - user.start_time > QUIZ_DURATION: return redirect("/submit")
     time_left = int(QUIZ_DURATION - (time.time() - user.start_time))
-    
+
     question_ids = session["shuffled_ids"]
     questions = [Question.query.get(qid) for qid in question_ids if Question.query.get(qid)]
     q_index = session["q_index"]
     total_q = session.get("total_q", len(questions))
-    
+
     if q_index >= total_q: return redirect("/submit")
-    
+
     if request.method == "POST":
         ans = request.form["answer"].lower().strip()
         session["answers"][str(q_index+1)] = ans
@@ -178,7 +179,7 @@ def quiz():
         session.modified = True
         color_rgb = request.args.get('color', '255,215,0')
         return redirect(f"/quiz?color={color_rgb}")
-    
+
     color_rgb = request.args.get('color', '255,215,0')
     return render_page(QUIZ_TEMPLATE, color_rgb=color_rgb, subject=session["subject"], question=questions[q_index], q_num=q_index+1, total_q=total_q, time_left=time_left, user_name=session["user_name"].title())
 
@@ -199,10 +200,10 @@ def admin():
             session["is_admin"] = True
             return redirect("/admin")
         else: return render_page('<body><div class="container"><h1>Wrong Password</h1><a href="/admin">Try Again</a></div></body>')
-    
+
     if not session.get("is_admin"):
         return render_page('<body><div class="container"><h1>Admin Login</h1><form method=POST><div class="input-group"><span class="input-icon">🔑</span><input type=password name=password placeholder="Admin Password"></div><button>Login</button></form></div></body>')
-    
+
     users = User.query.order_by(User.id.desc()).all()
     rows = ""
     for u in users:
@@ -218,7 +219,7 @@ def admin():
             <form method="POST" action="/admin/delete/{u.id}" onsubmit="return confirm('Delete {u.name}?')"><button class="btn-red">🗑️ Delete</button></form>
         </td>
         </tr>"""
-    
+
     new_pass = generate_password()
     admin_html = f"""<body><div class="container"><h1>Admin Dashboard 👑</h1>
     <form method="POST" action="/admin/create"><h3>➕ Create New User</h3>
