@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.7d - MUSIC + RIPPLE FIXED
+# SCHOLARS HAVEN V3.2.7f - FULL FIX: MUSIC + RIPPLE + JS
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -83,7 +83,7 @@ def get_base_css(r="255",g="215",b="0"):
 
 .home-container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); border: 1px solid rgba({color_rgb},0.2); border-radius:24px; box-shadow:0 0 20px rgba({color_rgb},0.15), inset 0 0 15px rgba({color_rgb},0.05); position:relative; z-index:1; overflow: hidden; padding: 30px;}}
 .home-container::before {{content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; border-radius: 25px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.05) 30%, rgba({color_rgb},0.6) 50%, rgba({color_rgb},0.05) 70%, transparent 100%); background-size: 300% 100%; animation: borderRipple var(--ripple-speed, 8s) linear infinite; z-index: -1; filter: blur(2px); opacity: 0.5;}}
-@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}} /* FIXED: ADDED }} */
+@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}}
 
 .home-container h1 {{color:rgb({color_rgb}); text-shadow:0 0 8px rgba({color_rgb},0.5);}}
 .home-container p {{color:#e5e5e5;}}
@@ -113,7 +113,7 @@ QUIZ_TEMPLATE = """<body class="home-body"><div class="container home-container"
 
 ADMIN_LOGIN_TEMPLATE = """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1>🔐 Admin Login</h1>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center; border:1px solid #ffd700">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div></body>"""
 
-ADMIN_TEMPLATE = """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.7d</h1><p style="font-weight:700; text-align:center">✅ FIXED: MUSIC + RIPPLE SYNC</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Music</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="font-weight:700">{{u.score}}/10</td><td>{{'🔊 ON' if u.music_on else '🔇 OFF'}}</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
+ADMIN_TEMPLATE = """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.7f</h1><p style="font-weight:700; text-align:center">✅ FIXED: MUSIC + RIPPLE + JS</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Music</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="font-weight:700">{{u.score}}/10</td><td>{{'🔊 ON' if u.music_on else '🔇 OFF'}}</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
 
 SUBMIT_TEMPLATE = """<body class="home-body"><div class="container home-container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/" style="display:block; text-align:center; margin-top:20px; background:#ffd700; color:#000; padding:12px; border-radius:8px; font-weight:700">Back to Login</a></div></body>"""
 
@@ -160,7 +160,80 @@ def home():
     user_name = session['user_name'].title()
     music_state = "ON" if session.get("music_on") else "OFF"
     music_icon = "🔊" if session.get("music_on") else "🔇"
-    html = f"""<body class="home-body"><audio id="bgMusic" loop preload="auto"><source src="{{{{ url_for('static', filename='lofi.mp3') }}}}" type="audio/mpeg"></audio><div class="container home-container"><h1>Welcome {user_name}</h1><p style="text-align:center; font-weight:600">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p><button id="musicBtn" onclick="toggleMusic()" style="width:auto; padding:14px 25px; font-size:16px; margin:0 auto 20px; display:block; animation:pulse 2s infinite">{music_icon} Music: {music_state}</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="" disabled selected>Select Subject</option>{subject_options}</select><button>Start Quiz</button></form><p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p></div><script>const music = document.getElementById('bgMusic'); const btn = document.getElementById('musicBtn'); music.volume = 0.25; let musicStarted = {str(session.get("music_on", False)).lower()}; function updateRippleSpeed(){{ const speed = music.paused? '8s' : '4s'; document.documentElement.style.setProperty('--ripple-speed', speed); }} function toggleMusic() {{ if(music.paused){{ music.play().then(()=>{{ btn.innerText = '🔊 Music: ON'; fetch('/save_music_pref/1'); musicStarted = true; updateRippleSpeed(); }}).catch(()=>{{alert('Tap again to start music')}}); }} else {{ music.pause(); btn.innerText = '🔇 Music: OFF'; fetch('/save_music_pref/0'); musicStarted = false; updateRippleSpeed(); }} /* FIXED: ADDED }} */ music.addEventListener('play', updateRippleSpeed); music.addEventListener('pause', updateRippleSpeed); updateRippleSpeed(); if(musicStarted){{ music.play().catch(()=>{{btn.innerText='🔇 Click to Start Music'}}); }} </script></body>"""
+    html = f"""<body class="home-body">
+    <audio id="bgMusic" loop preload="metadata">
+        <source src="{{{{ url_for('static', filename='lofi.mp3') }}}}" type="audio/mpeg">
+    </audio>
+
+    <div class="container home-container">
+        <h1>Welcome {user_name}</h1>
+        <p style="text-align:center; font-weight:600">UTME CBT | 10 Questions | 3 Minutes | 1 ATTEMPT TOTAL</p>
+        <button id="musicBtn" onclick="toggleMusic()" style="width:auto; padding:14px 25px; font-size:16px; margin:0 auto 20px; display:block; animation:pulse 2s infinite">{music_icon} Music: {music_state}</button>
+        <p id="musicStatus" style="text-align:center; font-size:12px; color:rgba(255,215,0,0.7); margin-top:-10px; margin-bottom:20px;"></p>
+
+        <form method="POST" action="/start_quiz">
+            <select name="subject" required>
+                <option value="" disabled selected>Select Subject</option>
+                {subject_options}
+            </select>
+            <button>Start Quiz</button>
+        </form>
+        <p style="text-align:center; margin-top:15px"><a href="/logout">Logout</a></p>
+    </div>
+
+    <script>
+    const music = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    const status = document.getElementById('musicStatus');
+    music.volume = 0.25;
+    let musicStarted = {str(session.get("music_on", False)).lower()};
+
+    music.addEventListener('error', () => {{
+        status.innerText = '❌ Error: lofi.mp3 not found in /static folder';
+        status.style.color = '#ff4757';
+    }});
+    music.addEventListener('loadeddata', () => {{
+        status.innerText = 'Music loaded. Tap button to play.';
+    }});
+
+    function updateRippleSpeed(){{
+        const speed = music.paused? '8s' : '4s';
+        document.documentElement.style.setProperty('--ripple-speed', speed);
+    }}
+
+    function toggleMusic() {{
+        if(music.paused){{
+            music.play().then(()=>{{
+                btn.innerText = '🔊 Music: ON';
+                status.innerText = 'Playing...';
+                fetch('/save_music_pref/1');
+                musicStarted = true;
+                updateRippleSpeed();
+            }}).catch((err)=>{{
+                alert('Browser blocked autoplay. Tap button again.');
+                console.error(err);
+            }});
+        }} else {{
+            music.pause();
+            btn.innerText = '🔇 Music: OFF';
+            status.innerText = 'Paused';
+            fetch('/save_music_pref/0');
+            musicStarted = false;
+            updateRippleSpeed();
+        }}
+    }}
+
+    music.addEventListener('play', updateRippleSpeed);
+    music.addEventListener('pause', updateRippleSpeed);
+    updateRippleSpeed();
+
+    if(musicStarted){{
+        music.play().catch(()=>{{
+            btn.innerText = '🔇 Click to Start Music';
+            status.innerText = 'Tap to enable sound';
+        }});
+    }}
+    </script></body>"""
     return render_template_string(get_base_css() + html)
 
 @app.route("/save_music_pref/<int:state>")
