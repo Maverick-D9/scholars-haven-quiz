@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.9 - FULL DARK GOLD + ADMIN CONTROLS RESTORED
+# SCHOLARS HAVEN V3.3.1 - 1 ATTEMPT TOTAL + FULL DARK GOLD RIPPLE
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -36,7 +36,7 @@ class User(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(20), nullable=False)
     subject = db.Column(db.String(100))
-    has_attempted = db.Column(db.Boolean, default=False)
+    has_attempted = db.Column(db.Boolean, default=False) # <-- 1 ATTEMPT TOTAL FLAG
     score = db.Column(db.Integer, default=0)
     start_time = db.Column(db.Float, default=0)
     submitted_at = db.Column(db.Float, default=0)
@@ -48,14 +48,6 @@ class Question(db.Model):
     prompt = db.Column(db.Text)
     options = db.Column(db.Text)
     answer = db.Column(db.String(5))
-
-class Attempt(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    subject = db.Column(db.String(100))
-    answers_json = db.Column(db.Text)
-    score = db.Column(db.Integer)
-    submitted_at = db.Column(db.Float)
 
 def load_questions():
     db.create_all()
@@ -74,36 +66,29 @@ def get_base_css(r="255",g="215",b="0"):
     return f"""<style> 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); 
 body {{font-family: 'Poppins', sans-serif; margin:0; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0a0a0a; color:#e5e5e5;}}
-.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 1px solid rgba({color_rgb},0.2); position:relative; overflow: hidden;}}
-.container::before {{content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; border-radius: 25px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.05) 30%, rgba({color_rgb},0.6) 50%, rgba({color_rgb},0.05) 70%, transparent 100%); background-size: 300% 100%; animation: borderRipple 8s linear infinite; z-index: -1; filter: blur(2px); opacity: 0.5;}}
-@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 300% 50%; }}}}
-h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 8px rgba({color_rgb},0.5); margin-bottom:10px;}}
+.container {{background:linear-gradient(145deg, #1a1a1a, #0f0f0f); padding:30px; border-radius:24px; width:90%; max-width:1000px; border: 1px solid rgba({color_rgb},0.2); position:relative; overflow: hidden; box-shadow: 0 0 40px rgba({color_rgb},0.15);}}
+.container::before {{content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 26px; background: linear-gradient(90deg, transparent 0%, rgba({color_rgb},0.1) 20%, rgba({color_rgb},1) 50%, rgba({color_rgb},0.1) 80%, transparent 100%); background-size: 400% 100%; animation: borderRipple 5s linear infinite; z-index: -1; filter: blur(4px);}}
+@keyframes borderRipple {{0% {{ background-position: 0% 50%; }} 100% {{ background-position: 400% 50%; }}}}
+h1 {{color:rgb({color_rgb}); text-align:center; text-shadow:0 0 20px rgba({color_rgb},0.8); margin-bottom:10px;}}
 .user-greet {{text-align:center; color:rgb({color_rgb}); font-weight:600; margin-bottom:20px; font-size:18px;}}
 .input-group {{position:relative; margin-top:12px;}}
 .input-group input {{width:100%; padding:14px 14px 14px 45px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 .input-icon {{position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px;}}
 select, button {{width:100%; padding:14px; margin-top:12px; border-radius:10px; border:1px solid rgb({color_rgb}); background:#1a1a1a; color:rgb({color_rgb}); font-size:16px; box-sizing:border-box;}}
 button {{background:linear-gradient(135deg, rgb({color_rgb}), #ffb700); color:#000; font-weight:700; cursor:pointer; transition:0.3s;}}
-button:hover {{transform:translateY(-2px); box-shadow:0 6px 20px rgba({color_rgb},0.6);}}
+button:hover {{transform:translateY(-3px); box-shadow:0 10px 30px rgba({color_rgb},0.8);}}
 .btn-red {{background:linear-gradient(135deg, #ff4757, #ff2e43); color:white;}}
-.btn-red:hover {{box-shadow:0 6px 20px rgba(255,71,87,0.6);}}
 .btn-green {{background:linear-gradient(135deg, #2ed573, #1e90ff); color:white;}}
 .timer {{background:#ff4757; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; font-size:18px; margin-bottom:15px;}}
 .question-box {{background:#222; padding:20px; border-radius:12px; border-left:5px solid rgb({color_rgb}); margin-bottom:20px;}}
-.question-title {{font-size:20px; font-weight:600; color:rgb({color_rgb}); margin-bottom:15px;}}
-.options label {{display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; color:#e5e5e5; cursor:pointer; transition:0.2s;}}
-.options label:hover {{border-color:rgb({color_rgb}); background:#222;}}
-.options input[type="radio"] {{accent-color: rgb({color_rgb}); width:20px; height:20px;}}
-.logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 15px rgba({color_rgb},0.8))}}
-@keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.7)}} 70%{{box-shadow:0 0 0 15px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
-.admin-link {{display:block; text-align:center; margin-top:20px; color:rgba({color_rgb},0.6); text-decoration:none; font-size:14px;}}
-.admin-link:hover {{color:rgb({color_rgb});}}
+.logo {{width:120px; display:block; margin:0 auto 15px; filter:drop-shadow(0 0 25px rgba({color_rgb},1))}}
+@keyframes pulse {{0%{{box-shadow:0 0 0 0 rgba({color_rgb},0.8)}} 70%{{box-shadow:0 0 0 25px rgba({color_rgb},0)}} 100%{{box-shadow:0 0 0 0 rgba({color_rgb},0)}}}}
 table {{width:100%; border-collapse:collapse; margin-top:20px;}}
 th, td {{padding:12px; border:1px solid #333; text-align:left;}}
 th {{background:rgba({color_rgb},0.1); color:rgb({color_rgb});}}
 .actions {{display:flex; gap:8px;}}
-.actions form {{margin:0;}}
 .actions button {{padding:8px 12px; font-size:14px; margin:0; width:auto;}}
+.warning {{background:rgba(255,71,87,0.2); color:#ff4757; padding:15px; border-radius:10px; text-align:center; border:1px solid #ff4757;}}
 </style>"""
 
 subject_options = "".join([f"<option>{s}</option>" for s in ALL_QUESTIONS])
@@ -112,13 +97,13 @@ def render_page(template, color_rgb="255,215,0", **kwargs):
     r,g,b = color_rgb.split(",")
     return render_template_string(get_base_css(r,g,b) + template, **kwargs)
 
-LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" class="logo"><h1>Scholars'Haven</h1><p style="text-align:center; color:rgba(255,215,0,0.8); margin-bottom:30px;">UTME CBT Portal</p>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center;">{{error}}</p>{% endif %}<form method="POST"><div class="input-group"><span class="input-icon">👤</span><input name="name" placeholder="Full Name" required></div><div class="input-group"><span class="input-icon">🔒</span><input type="password" name="password" placeholder="Password" required></div><button>Login →</button></form><a href="/admin" class="admin-link">Admin Panel</a></div></body>"""
+LOGIN_TEMPLATE = """<body><div class="container"><img src="{{ url_for('static', filename='raven.png') }}" class="logo"><h1>Scholars'Haven</h1><p style="text-align:center; color:rgba(255,215,0,0.8); margin-bottom:30px;">UTME CBT Portal</p>{% if error %}<p class="warning">{{error}}</p>{% endif %}<form method="POST"><div class="input-group"><span class="input-icon">👤</span><input name="name" placeholder="Full Name" required></div><div class="input-group"><span class="input-icon">🔒</span><input type="password" name="password" placeholder="Password" required></div><button>Login →</button></form><a href="/admin" style="display:block; text-align:center; margin-top:20px; color:rgba(255,215,0,0.6);">Admin Panel</a></div></body>"""
 
-HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><div class="user-greet">UTME CBT | 10 Questions | 3 Minutes</div><button id="musicBtn" onclick="toggleMusic()" style="width:auto; margin:0 auto 20px; display:block; animation:pulse 2s infinite">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
+HOME_TEMPLATE = """<body><audio id="bgMusic" loop><source src="{{ url_for('static', filename='lofi.mp3') }}" type="audio/mpeg"></audio><div class="container"><h1>Welcome {{user_name}}</h1><div class="user-greet">UTME CBT | 10 Questions | 3 Minutes | 1 Attempt Only</div><button id="musicBtn" onclick="toggleMusic()" style="width:auto; margin:0 auto 20px; display:block; animation:pulse 2s infinite">🔊 Music: ON</button><form method="POST" action="/start_quiz"><select name="subject" required><option value="">-- Select Subject --</option>{{subject_options|safe}}</select><button>Start Quiz</button></form><script>const audio=document.getElementById('bgMusic');let musicOn=true;function toggleMusic(){musicOn=!musicOn;if(musicOn){audio.play()}else{audio.pause()}document.getElementById('musicBtn').innerText=musicOn?'🔊 Music: ON':'🔇 Music: OFF'}document.addEventListener('click',()=>{if(musicOn)audio.play()},{once:true});</script></div></body>"""
 
-QUIZ_TEMPLATE = """<body><div class="container"><h1>{{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div class="question-title">Question {{q_num}} of {{total_q}}</div><div>{{question.prompt}}</div></div><div class="options">{% for opt in question.options.split('\\n') %}<label><input type="radio" name="answer" value="{{opt[0]}}" required><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)document.querySelector('form').submit()},1000)</script></div></body>"""
+QUIZ_TEMPLATE = """<body><div class="container"><h1>{{subject}}</h1><div class="user-greet">Hi {{user_name}} 👋</div><div class="timer">⏱ Time Left: <span id="timer">{{time_left}}</span> seconds</div><form method="POST"><div class="question-box"><div style="font-size:20px; font-weight:600; color:rgb({{color_rgb}}); margin-bottom:15px;">Question {{q_num}} of {{total_q}}</div><div>{{question.prompt}}</div></div><div>{% for opt in question.options.split('\\n') %}<label style="display:flex; align-items:center; gap:12px; background:#1a1a1a; padding:14px; margin:10px 0; border-radius:10px; border:2px solid #333; cursor:pointer;"><input type="radio" name="answer" value="{{opt[0]}}" required style="accent-color: rgb({{color_rgb}}); width:20px; height:20px;"><span>{{opt}}</span></label>{% endfor %}</div><button>Next Question →</button></form><script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)document.querySelector('form').submit()},1000)</script></div></body>"""
 
-SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Score: {{score}}/{{total_q}}</p></div></body>"""
+SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Score: {{score}}/{{total_q}} in {{subject}}</p><p style="text-align:center; color:rgba(255,71,87,0.8)">You cannot attempt again</p></div></body>"""
 
 @app.route("/init")
 def init_db():
@@ -143,6 +128,9 @@ def login():
 @app.route("/home")
 def home():
     if "user_id" not in session: return redirect("/")
+    user = User.query.get(session["user_id"])
+    if user.has_attempted:
+        return render_page('<body><div class="container"><h1>Attempt Completed</h1><p class="warning">You have already completed your 1 attempt.</p></div></body>')
     user_name = session['user_name'].title()
     return render_page(HOME_TEMPLATE, user_name=user_name, subject_options=subject_options)
 
@@ -177,7 +165,6 @@ def quiz():
     
     question_ids = session["shuffled_ids"]
     questions = [Question.query.get(qid) for qid in question_ids if Question.query.get(qid)]
-    
     q_index = session["q_index"]
     total_q = session.get("total_q", len(questions))
     
@@ -203,7 +190,7 @@ def submit():
         user.has_attempted = True
         user.score = session.get("score", 0)
         db.session.commit()
-    return render_page(SUBMIT_TEMPLATE, name=session["user_name"].title(), score=user.score, total_q=session.get("total_q", 10))
+    return render_page(SUBMIT_TEMPLATE, name=session["user_name"].title(), score=user.score, total_q=session.get("total_q", 10), subject=user.subject)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -240,7 +227,7 @@ def admin():
     <button class="btn-green">Generate & Create User</button></form>
     <h3 style="margin-top:30px;">All Users</h3>
     <table><tr><th>Name</th><th>Password</th><th>Subject</th><th>Score</th><th>Status</th><th>Actions</th></tr>{rows}</table>
-    <br><a href="/" class="admin-link">Back to Home</a>
+    <br><a href="/" style="display:block; text-align:center; color:gold;">Back to Home</a>
     </div></body>"""
     return render_page(admin_html)
 
