@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.4.1 - SKIP + SUBMIT + TIMER TOP RIGHT + GENTLE GOLD GLOW
+# SCHOLARS HAVEN V3.5.0 - RANDOM SLANG SUBMIT + SKIP + TIMER + GENTLE GLOW
 from flask import Flask, render_template_string, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from questions import ALL_QUESTIONS
@@ -30,6 +30,50 @@ SUBJECT_COLORS = {
     "Chemistry": "46,213,115", "Biology": "112,161,255", "Government": "255,165,2",
     "Economics": "123,237,159", "Literature": "232,67,147", "CRS": "162,155,254"
 }
+
+# 40 RANDOM NAIJA SLANGS FOR SUBMIT PAGE
+SUBMIT_MESSAGES = [
+    "E go be like say you wan die but u nor fit die 😂",
+    "You try o! No be beans",
+    "Na so grace carry you reach here",
+    "God dey! You don finish am",
+    "Wahala no dey finish, but you finish this one",
+    "My brother/my sister, you strong!",
+    "You don submit. Make we leave am for God",
+    "E don set! Rest your brain small",
+    "You do well. No shaking",
+    "Na who dey alive dey write exam again",
+    "You see am? You scale through",
+    "No gree for anybody. You don try",
+    "This life na turn by turn. Your turn don reach",
+    "Chai! You fit am",
+    "You be real g. Respect",
+    "Make dem no tell you say e easy",
+    "You don do your own. The rest na God",
+    "No panic. Everything go soft",
+    "You be original Scholars'Haven product",
+    "See finishing! Well done",
+    "Na so life be. Up and down",
+    "You no fall my hand. Good job",
+    "Omo! You try well",
+    "E get why. You be scholar",
+    "Submission complete. Go chop rice",
+    "You run am. No dull",
+    "Na grace. No be your power",
+    "You don hammer this one",
+    "Small sturboness and you make am",
+    "You be the real MVP",
+    "Make nobody vex you today",
+    "You don cross this bridge",
+    "Keep your head up. You try",
+    "Na God and luck. You don submit",
+    "No worry, e go pay you later",
+    "You be correct person",
+    "E be like say you read small",
+    "Mission accomplished, soldier",
+    "You finish am like gala",
+    "Welcome to the other side. You dey free now"
+]
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -132,7 +176,9 @@ QUIZ_TEMPLATE = """<body>
 <script>let time={{time_left}};setInterval(()=>{time--;document.getElementById('timer').innerText=time;if(time<=0)window.location.href='/submit'},1000)</script>
 </div></body>"""
 
-SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px">Thank you {{name}}!<br>Score: {{score}}/{{total_q}} in {{subject}}</p><p style="text-align:center; color:rgba(255,71,87,0.8)">You cannot attempt again</p></div></body>"""
+SUBMIT_TEMPLATE = """<body><div class="container"><h1>Submitted ✅</h1>
+<p style="text-align:center; font-size:22px; font-weight:700; color:rgb({{color_rgb}}); margin:20px 0;">{{message}}</p>
+<p style="text-align:center; color:rgba(255,255,255,0.6)">Your result is with Admin. 1 Attempt Used.</p></div></body>"""
 
 @app.route("/init")
 def init_db():
@@ -227,9 +273,12 @@ def submit():
     user = User.query.get(session["user_id"])
     if not user.has_attempted:
         user.has_attempted = True
-        user.score = session.get("score", 0)
+        user.score = session.get("score", 0) # Still save for admin
         db.session.commit()
-    return render_page(SUBMIT_TEMPLATE, name=session["user_name"].title(), score=user.score, total_q=session.get("total_q", 10), subject=user.subject)
+
+    message = random.choice(SUBMIT_MESSAGES) # 1 random slang
+    color_rgb = SUBJECT_COLORS.get(user.subject, "255,215,0")
+    return render_page(SUBMIT_TEMPLATE, message=message, color_rgb=color_rgb)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
