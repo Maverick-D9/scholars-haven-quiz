@@ -1,4 +1,4 @@
-# SCHOLARS HAVEN V3.2.4 - DARK GOLD GLITTER UI + LOFI MUSIC FROM STATIC
+# SCHOLARS HAVEN V3.2.5 - DARK GOLD GLITTER UI + LOFI MUSIC + RIPPLE BORDER
 from flask import Flask, render_template_string, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import time
@@ -70,7 +70,35 @@ BASE_CSS = """<style> @import url('https://fonts.googleapis.com/css2?family=Popp
 .home-body::before {content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:radial-gradient(2px 2px at 20px 30px, #ffd700, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent), radial-gradient(2px 2px at 50px 160px, #ffd700, transparent), radial-gradient(2px 2px at 120px 40px, #fff, transparent), radial-gradient(3px 3px at 130px 80px, #ffd700, transparent), radial-gradient(2px 2px at 160px 120px, #fff, transparent); background-size:200px 200px; animation:twinkle 3s linear infinite; z-index:0;}
 @keyframes twinkle {0% {opacity:0.3;} 50% {opacity:1;} 100% {opacity:0.3;}}
 
-.home-container {background:linear-gradient(145deg, #1a1a1a, #0f0f0f); border:2px solid #ffd700; border-radius:24px; box-shadow:0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); position:relative; z-index:1;}
+/* RIPPLE BORDER CONTAINER */
+.home-container {
+    background:linear-gradient(145deg, #1a1a1a, #0f0f0f); 
+    border-radius:24px; 
+    box-shadow:0 0 30px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.1); 
+    position:relative; 
+    z-index:1;
+    overflow: hidden;
+    padding: 30px;
+}
+.home-container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 26px;
+    background: linear-gradient(90deg, transparent, #ffd700, #fff, #ffd700, transparent);
+    background-size: 400% 100%;
+    animation: borderRipple 3s linear infinite;
+    z-index: -1;
+    filter: blur(6px);
+}
+@keyframes borderRipple {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+}
+
 .home-container h1 {color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.8);}
 .home-container p {color:#e5e5e5;}
 .home-container input,.home-container select {background:#1a1a1a; color:#ffd700; border:1px solid #ffd700;}
@@ -97,7 +125,7 @@ QUIZ_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home
 
 ADMIN_LOGIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="padding:40px 30px; max-width:450px"><h1 style="color:#ffd700">🔐 Admin Login</h1>{% if error %}<p style="background:rgba(255,0,0,0.2); color:#ffd700; padding:10px; border-radius:8px; text-align:center; border:1px solid #ffd700">{{error}}</p>{% endif %}<form method="POST"><input type="password" name="password" placeholder="Enter Admin Password" required><button>Login</button></form></div></body>"""
 
-ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.4</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI + LOFI MUSIC FROM STATIC</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
+ADMIN_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container" style="max-width:1000px"><h1>👑 Admin Panel v3.2.5</h1><p style="color:#ffd700; font-weight:700; text-align:center">✅ DARK GOLD GLITTER UI + LOFI MUSIC + RIPPLE BORDER</p><div style="display:flex; justify-content:space-between; margin-bottom:15px; flex-wrap:wrap; gap:10px"><a href="/wipe_db" onclick="return confirm('DANGER: This will DELETE ALL USERS AND ATTEMPTS.')" style="background:#ff4757; color:white; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">🗑️ WIPE ENTIRE DB</a><a href="/logout" style="background:#ffd700; color:#000; padding:12px 20px; border-radius:8px; font-weight:700; text-decoration:none">Logout</a></div><div style="overflow-x:auto"><table class="dark-table"><tr><th>Name</th><th>Password</th><th>Subject Taken</th><th>Score</th><th>Actions</th></tr>{% for u in users %}<tr><td>{{u.name.title()}}</td><td style="color:#ffd700; font-weight:700">{{u.password}}</td><td>{{u.subject if u.subject else '-'}}</td><td style="color:#ffd700; font-weight:700">{{u.score}}/10</td><td><a href="/reset_user/{{u.id}}" style="color:#ff4757; font-weight:700;">Delete</a></td></tr>{% endfor %}</table></div></div></body>"""
 
 SUBMIT_TEMPLATE = BASE_CSS + """<body class="home-body"><div class="container home-container"><h1>Submitted ✅</h1><p style="text-align:center; font-size:18px; color:#e5e5e5">Thank you {{name}}!<br>You cannot take any other subject again.</p><a href="/" style="display:block; text-align:center; margin-top:20px; background:#ffd700; color:#000; padding:12px; border-radius:8px; font-weight:700">Back to Login</a></div></body>"""
 
